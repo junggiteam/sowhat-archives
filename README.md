@@ -11,6 +11,7 @@
 - SEO: 월별 정적 페이지(`/2026/11/` 등), 월별 고유 제목·설명·canonical, 발행호 ItemList와 WebSite/Breadcrumb 구조화 데이터, 전체 월별 링크 및 자동 사이트맵을 생성합니다.
 - 새 달의 발행호가 추가되면 월별 페이지와 사이트맵도 같은 자동 갱신 작업에서 생성됩니다. 검색엔진의 수집·색인 시점은 검색엔진이 결정합니다.
 - 공유 이미지: `assets/sowhat-share.png` (1200×630). 원본 생성 코드는 `make_share_image.py`이며 로컬 Windows/Pillow로 렌더링합니다. 자동 갱신에는 Pillow가 필요 없습니다.
+- 네이버 소유 확인용 공개 메타 태그는 `site-verification.json`에서 읽어 매번 생성합니다. 이 값은 공개 HTML에 게시하는 소유 확인 값이며 로그인 비밀키가 아닙니다.
 
 로컬 빌드: `python build_site.py`
 

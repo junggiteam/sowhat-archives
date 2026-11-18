@@ -18,6 +18,7 @@ from build_sowhat_widget import build, render_widget, month_name, month_url
 ROOT = Path(__file__).resolve().parent
 CANONICAL = 'https://sowhat.bestexit.co.kr/'
 UPSTREAM = 'https://raw.githubusercontent.com/junggiteam/naver-news/main/data/sowhat_archive.json'
+VERIFICATION = json.loads((ROOT / 'site-verification.json').read_text(encoding='utf-8'))
 
 
 def refresh() -> None:
@@ -69,6 +70,7 @@ def render_page(payload: dict, archive_month: str = '') -> str:
 <title>{escape(title)}</title>
 <meta name="description" content="{escape(description,quote=True)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="naver-site-verification" content="{escape(VERIFICATION['naver'],quote=True)}">
 <link rel="canonical" href="{canonical}">
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preconnect" href="https://img2.stibee.com">
