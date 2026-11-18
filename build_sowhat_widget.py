@@ -36,7 +36,7 @@ def render_widget(all_items: list[dict], archive_month: str = '') -> str:
         month_links += f'<a class="swa-month-link" href="{month_url(key)}"{current}>{month_name(key)} <span>{value}</span></a>'
     name = (month_name(archive_month) + ' ' if archive_month else '') + '쏘왓레터 모아보기'
     heading = '<span class="swa-title-letter">쏘왓레터</span><span class="swa-title-archive">모아보기</span>'
-    description = (month_name(archive_month) + '에 발행된 중기이코노미 쏘왓레터를 대표이미지와 제목으로 살펴보세요.') if archive_month else '중기이코노미의 경제·기업·M&A·기업승계·세무 뉴스레터. 지난 발행호를 대표이미지와 제목으로 살펴보세요.'
+    description = (month_name(archive_month) + '에 발행된 경제·경영 뉴스레터 쏘왓레터를 대표이미지와 제목으로 살펴보세요.') if archive_month else '경제뉴스레터·경영뉴스레터 쏘왓레터. 중기이코노미가 경제 흐름과 기업 경영에 필요한 M&A·기업승계·세무 인사이트를 전합니다.'
     structured = {'@context':'https://schema.org','@type':'CollectionPage','@id':canonical+'#archive','name':name,'url':canonical,'inLanguage':'ko-KR','isPartOf':{'@id':BASE+'#website'},'mainEntity':{'@type':'ItemList','numberOfItems':len(data),'itemListElement':[{'@type':'ListItem','position':i+1,'item':{'@type':'CreativeWork','name':x['title'],'url':x['url'],'datePublished':x['date'],**({'image':x['image']} if x.get('image') else {})}} for i,x in enumerate(data)]}}
     template = (WIDGETS / 'sowhat-archive-template.html').read_text(encoding='utf-8')
     label = month_name(archive_month) + ' 뉴스레터' if archive_month else '모든 뉴스레터'

@@ -45,16 +45,18 @@ def refresh() -> None:
 
 
 def page_title(archive_month: str) -> str:
-    return ((month_name(archive_month) + ' ') if archive_month else '') + '쏘왓레터 모아보기 | 중기이코노미 · 베스트엑싯'
+    if archive_month:
+        return month_name(archive_month) + ' 경제·경영 뉴스레터 모아보기 | 쏘왓레터'
+    return '쏘왓레터 | 경제뉴스레터·경영뉴스레터 - 중기이코노미'
 
 
 def render_page(payload: dict, archive_month: str = '') -> str:
     items = [x for x in payload['items'] if not archive_month or x['date'].startswith(archive_month)]
     canonical = month_url(archive_month)
     title = page_title(archive_month)
-    description = (f'{month_name(archive_month)} 중기이코노미 쏘왓레터 {len(items)}개 발행호를 모아보세요. ' if archive_month else '중기이코노미 쏘왓레터의 경제·기업·M&A·기업승계·세무 인사이트를 만나보세요. ') + '대표이미지와 제목으로 지난 뉴스레터를 검색하고 원문 읽기와 구독 신청을 할 수 있습니다.'
+    description = (f'{month_name(archive_month)} 경제·경영 뉴스레터 쏘왓레터 {len(items)}개 발행호를 모았습니다. ' if archive_month else '경제뉴스레터·경영뉴스레터 쏘왓레터. 중기이코노미가 경제 흐름과 기업 경영에 필요한 M&A·기업승계·세무 인사이트를 전합니다. ') + '대표이미지와 제목으로 지난 발행호를 찾고 원문 읽기와 구독 신청을 할 수 있습니다.'
     graph = [
-        {'@type':'WebSite','@id':CANONICAL+'#website','url':CANONICAL,'name':'쏘왓레터 모아보기','alternateName':'SO WHAT?','inLanguage':'ko-KR','publisher':{'@type':'Organization','name':'중기이코노미'}},
+        {'@type':'WebSite','@id':CANONICAL+'#website','url':CANONICAL,'name':'쏘왓레터 모아보기','alternateName':'SO WHAT!?','description':'경제뉴스레터·경영뉴스레터 쏘왓레터의 경제·기업 경영·M&A·기업승계·세무 인사이트 아카이브','inLanguage':'ko-KR','publisher':{'@type':'Organization','name':'중기이코노미'}},
     ]
     if archive_month:
         graph.append({'@type':'BreadcrumbList','itemListElement':[
@@ -84,7 +86,7 @@ def render_page(payload: dict, archive_month: str = '') -> str:
 <meta property="og:image" content="{image}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="중기이코노미 쏘왓레터 모아보기 — 경제·기업·M&A·기업승계·세무 뉴스레터">
+<meta property="og:image:alt" content="중기이코노미 경제뉴스레터·경영뉴스레터 쏘왓레터 모아보기">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{escape(title,quote=True)}">
 <meta name="twitter:description" content="{escape(description,quote=True)}">
