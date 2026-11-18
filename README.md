@@ -16,3 +16,11 @@
 로컬 빌드: `python build_site.py`
 
 공개 데이터 갱신 후 빌드: `python build_site.py --refresh`
+
+운영 점검: `python -X utf8 monitor_archive.py`
+
+- 스티비 공개 발행 목록과 공통 JSON·공개 HTML·사이트맵을 비교하며 최신 대표이미지, 수집 실패 및 6시간 이상 실행 중단도 확인합니다.
+- 발행호·제목·검색용 HTML의 미반영은 첫 발견 후 90분의 유예를 둡니다. 일시적인 접근 오류는 30분 유예 후 경고합니다.
+- 결과와 중복 알림 상태는 로컬 `.monitor/state.json`에 보관하며 Git에 올리지 않습니다. 파일을 지우면 누락 유예와 중복 방지 기록이 초기화됩니다.
+- 실제 이메일 전송 완료 후에만 `python monitor_archive.py --ack-notification <fingerprint>`를 실행합니다. 전송 전에는 확인 처리하지 않습니다.
+- 점검 스크립트 자체는 메일을 전송하지 않습니다. 연결된 Gmail과 Codex 정기 점검으로 발송하며, 로컬 점검은 컴퓨터와 앱이 실행 중이어야 합니다.
