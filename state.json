@@ -1,0 +1,33 @@
+{
+  "incidents": {},
+  "lastCheckedAt": "2026-11-18T08:33:47.308398+00:00",
+  "lastReport": {
+    "status": "healthy",
+    "event": null,
+    "emailRequired": false,
+    "fingerprint": "healthy",
+    "issues": [],
+    "pending": [],
+    "checkedAt": "2026-11-18T08:33:47.308398+00:00",
+    "counts": {
+      "sourceCount": 115,
+      "feedCount": 115,
+      "htmlCount": 115
+    },
+    "workflows": [
+      {
+        "repository": "naver-news",
+        "conclusion": "success",
+        "url": "https://github.com/junggiteam/naver-news/actions/runs/44252952471",
+        "createdAt": "2026-11-18T06:39:32Z"
+      },
+      {
+        "repository": "sowhat-archives",
+        "conclusion": "success",
+        "url": "https://github.com/junggiteam/sowhat-archives/actions/runs/44259455818",
+        "createdAt": "2026-11-18T07:30:47Z"
+      }
+    ],
+    "site": "https://sowhat.bestexit.co.kr/"
+  }
+}
