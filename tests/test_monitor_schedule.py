@@ -30,15 +30,16 @@ class MonitorScheduleTests(unittest.TestCase):
     def test_weekends_and_off_hours_do_not_even_fetch_calendar(self):
         loader = Mock(side_effect=AssertionError('calendar must not be called'))
         for value in ['2026-11-21T16:00','2026-11-22T16:00',
-                      '2026-11-18T14:59','2026-11-18T17:01','2026-11-18T23:00']:
+                      '2026-11-18T15:59','2026-11-18T18:01','2026-11-18T23:00']:
             self.assertFalse(decision(at(value),loader)['allowed'])
         loader.assert_not_called()
 
-    def test_korean_15_to_17_boundaries_and_utc_conversion(self):
+    def test_requested_slots_scheduler_delay_and_utc_conversion(self):
         loader = lambda year:{}
-        for value in ['2026-11-18T15:00','2026-11-18T16:10','2026-11-18T16:50','2026-11-18T17:00']:
+        for value in ['2026-11-18T16:00','2026-11-18T16:30','2026-11-18T17:30',
+                      '2026-11-18T17:45','2026-11-18T18:00']:
             self.assertTrue(decision(at(value),loader)['allowed'])
-        utc = datetime(2026,11,18,6,10,tzinfo=timezone.utc)
+        utc = datetime(2026,11,18,8,30,tzinfo=timezone.utc)
         self.assertTrue(decision(utc,loader)['allowed'])
 
     def test_actual_holidays_and_substitutes_are_skipped(self):

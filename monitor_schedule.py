@@ -98,8 +98,9 @@ def decision(now, holiday_loader=load_holidays):
     result = {'allowed':False,'localTime':local.isoformat()}
     if local.weekday() >= 5:
         return {**result,'reason':'weekend'}
-    if not 15*60 <= local.hour*60+local.minute <= 17*60:
-        return {**result,'reason':'outside-15-to-17'}
+    # Only three cron slots exist; allow up to 30 minutes of delay for 17:30.
+    if not 16*60 <= local.hour*60+local.minute <= 18*60:
+        return {**result,'reason':'outside-16-to-18-delay-window'}
     days = holiday_loader(local.year)
     name = days.get(local.date().isoformat())
     if name:
