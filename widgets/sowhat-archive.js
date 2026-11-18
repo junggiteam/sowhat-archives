@@ -11,7 +11,6 @@
   const empty = root.querySelector('[data-swa-empty]');
   const months = root.querySelector('[data-swa-months]');
   const structured = root.querySelector('[data-swa-structured]');
-  const archiveIndex = root.querySelector('[data-swa-archive-index]');
   const archiveMonth = root.dataset.archiveMonth || '';
   const archiveBase = root.dataset.archiveBase;
   const archiveUrl = key => archiveBase + (key ? key.replace('-', '/') + '/' : '');
@@ -57,15 +56,13 @@
     counts.forEach((value, key) => { if (!archiveMonth || publishedMonths.has(key)) month.add(new Option(monthName(key), key)); });
     month.value = counts.has(selected) ? selected : '';
     months.replaceChildren();
-    [['', allItems.length], ...Array.from(counts.entries()).filter(([key])=>publishedMonths.has(key)).slice(0, 3)].forEach(([key, value]) => {
+    [['', allItems.length], ...Array.from(counts.entries()).filter(([key])=>publishedMonths.has(key))].forEach(([key, value]) => {
       const link = element('a', 'swa-month-link');
       link.href = archiveUrl(key);
       if (key === archiveMonth) link.setAttribute('aria-current', 'page');
       link.append(document.createTextNode(key ? monthName(key) : '전체 뉴스레터'), element('span', '', String(value)));
       months.append(link);
     });
-    archiveIndex.replaceChildren();
-    counts.forEach((value,key) => { if (!publishedMonths.has(key)) return; const link = element('a', '', monthName(key) + ' ' + value + '개'); link.href = archiveUrl(key); archiveIndex.append(link); });
     if (structured) structured.textContent = JSON.stringify({'@context':'https://schema.org','@type':'CollectionPage','@id':root.dataset.canonicalUrl+'#archive',name:(archiveMonth ? monthName(archiveMonth)+' ' : '')+'쏘왓레터 모아보기',url:root.dataset.canonicalUrl,inLanguage:'ko-KR',isPartOf:{'@id':archiveBase+'#website'},mainEntity:{'@type':'ItemList',numberOfItems:dataset.length,itemListElement:dataset.map((x,i)=>({'@type':'ListItem',position:i+1,item:{'@type':'CreativeWork',name:x.title,url:x.url,datePublished:x.date,...(x.image ? {image:x.image} : {})}}))}});
   }
   function card(x, index) {
@@ -88,12 +85,13 @@
       image.addEventListener('error', () => { image.remove(); cover.classList.add('swa-no-image'); }, {once:true});
       cover.append(image);
     } else cover.classList.add('swa-no-image');
-    if (x.id === dataset[0].id) cover.append(element('span', 'swa-latest', 'LATEST'));
     const meta = element('p', 'swa-meta');
     const date = element('time', '', x.date.replace(/-/g, '.'));
     date.dateTime = x.date;
-    meta.append(element('span', 'swa-volume', x.volume ? 'Vol. ' + String(x.volume).padStart(3, '0') : 'SO WHAT LETTER'), element('i', '', '·'), date);
-    anchor.append(cover, meta, element('h2', '', x.title));
+    meta.append(element('span', 'swa-volume', x.volume ? 'Vol. ' + String(x.volume).padStart(3, '0') : 'SO WHAT LETTER'), date);
+    const body = element('div', 'swa-card-body');
+    body.append(meta, element('h2', '', x.title));
+    anchor.append(cover, body);
     article.append(anchor);
     return article;
   }
