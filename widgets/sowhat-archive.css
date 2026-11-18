@@ -24,7 +24,7 @@
 #sowhat-archive .swa-rail-rule{border:0;border-top:1px solid #e5e5dd;margin:26px 0 19px}
 #sowhat-archive .swa-rail-title{font-size:11px;letter-spacing:.05em;color:#949489;margin-bottom:10px}
 #sowhat-archive .swa-month-link{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;background:transparent;border:0;border-radius:0;min-height:35px;padding:8px 0;font-size:12px;color:#6c6c61;text-align:left}
-#sowhat-archive .swa-month-link[aria-pressed=true]{font-weight:650;color:#d12f30}
+#sowhat-archive .swa-month-link[aria-current=page]{font-weight:650;color:#d12f30}
 #sowhat-archive .swa-month-link span{font-size:11px;color:#96968b;font-weight:400}
 #sowhat-archive .swa-form{margin-top:25px;width:300px;max-width:100%;scroll-margin-top:28px}
 #sowhat-archive .swa-form iframe{display:block;width:300px;max-width:100%;height:288px;border:0;background:#fff}
@@ -58,6 +58,11 @@
 #sowhat-archive .swa-more{min-width:190px;min-height:40px;border:1px solid #deded3;border-radius:3px;background:#fff;color:#636359;font-size:12px;padding:9px 23px}
 #sowhat-archive .swa-more:hover{background:#f7f7f1}
 #sowhat-archive .swa-shown{font-size:10px;color:#99998b;margin-top:12px}
+#sowhat-archive .swa-archive-index{margin-top:35px;padding-top:20px;border-top:1px solid #e7e7df;font-size:12px;color:#6c6c61}
+#sowhat-archive .swa-archive-index p{font-weight:600;margin-bottom:12px}
+#sowhat-archive .swa-archive-index>div{display:flex;flex-wrap:wrap;gap:9px 15px}
+#sowhat-archive .swa-archive-index a{text-decoration:underline;text-underline-offset:3px}
+#sowhat-archive .swa-archive-index a span{color:#929284;font-size:10px}
 #sowhat-archive .swa-footer{border-top:1px solid #e7e7de;padding:23px 0;display:flex;justify-content:space-between;align-items:center;gap:15px;font-size:10px;color:#929284}
 #sowhat-archive .swa-footer strong{font-size:12px;font-weight:600;color:#67675a}
 #sowhat-archive .swa-footer a{margin-left:15px;white-space:nowrap}

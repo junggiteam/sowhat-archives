@@ -6,13 +6,14 @@ discovery by search engines. No account tokens or subscriber data are required.
 """
 from pathlib import Path
 from html import escape
+from collections import Counter
 import argparse
 import json
-import sys
 import time
 import urllib.request
+from xml.etree.ElementTree import Element, SubElement, tostring
 
-from build_sowhat_widget import build
+from build_sowhat_widget import build, render_widget, month_name, month_url
 
 ROOT = Path(__file__).resolve().parent
 CANONICAL = 'https://sowhat.bestexit.co.kr/'
@@ -20,7 +21,7 @@ UPSTREAM = 'https://raw.githubusercontent.com/junggiteam/naver-news/main/data/so
 
 
 def refresh() -> None:
-    request = urllib.request.Request(UPSTREAM, headers={'User-Agent':'BestExit-SoWhatSite/1.0'})
+    request = urllib.request.Request(UPSTREAM + '?v=' + str(int(time.time() // 300)), headers={'User-Agent':'BestExit-SoWhatSite/1.0'})
     for attempt in range(3):
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
@@ -42,6 +43,68 @@ def refresh() -> None:
             time.sleep(2)
 
 
+def page_title(archive_month: str) -> str:
+    return ((month_name(archive_month) + ' ') if archive_month else '') + '쏘왓레터 모아보기 | 중기이코노미 · 베스트엑싯'
+
+
+def render_page(payload: dict, archive_month: str = '') -> str:
+    items = [x for x in payload['items'] if not archive_month or x['date'].startswith(archive_month)]
+    canonical = month_url(archive_month)
+    title = page_title(archive_month)
+    description = (f'{month_name(archive_month)} 중기이코노미 쏘왓레터 {len(items)}개 발행호를 모아보세요. ' if archive_month else '중기이코노미 쏘왓레터의 경제·기업·M&A·기업승계·세무 인사이트를 만나보세요. ') + '대표이미지와 제목으로 지난 뉴스레터를 검색하고 원문 읽기와 구독 신청을 할 수 있습니다.'
+    graph = [
+        {'@type':'WebSite','@id':CANONICAL+'#website','url':CANONICAL,'name':'쏘왓레터 모아보기','alternateName':'SO WHAT?','inLanguage':'ko-KR','publisher':{'@type':'Organization','name':'중기이코노미'}},
+    ]
+    if archive_month:
+        graph.append({'@type':'BreadcrumbList','itemListElement':[
+            {'@type':'ListItem','position':1,'name':'쏘왓레터 모아보기','item':CANONICAL},
+            {'@type':'ListItem','position':2,'name':month_name(archive_month),'item':canonical},
+        ]})
+    structured = json.dumps({'@context':'https://schema.org','@graph':graph},ensure_ascii=False).replace('<','\\u003c')
+    image = CANONICAL+'assets/sowhat-share.png'
+    head = f'''<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{escape(title)}</title>
+<meta name="description" content="{escape(description,quote=True)}">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="{canonical}">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="preconnect" href="https://img2.stibee.com">
+<link rel="dns-prefetch" href="https://raw.githubusercontent.com">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="중기이코노미 쏘왓레터">
+<meta property="og:title" content="{escape(title,quote=True)}">
+<meta property="og:description" content="{escape(description,quote=True)}">
+<meta property="og:url" content="{canonical}">
+<meta property="og:image" content="{image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="중기이코노미 쏘왓레터 모아보기 — 경제·기업·M&A·기업승계·세무 뉴스레터">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{escape(title,quote=True)}">
+<meta name="twitter:description" content="{escape(description,quote=True)}">
+<meta name="twitter:image" content="{image}">
+<meta name="theme-color" content="#d12f30">
+<script type="application/ld+json">{structured}</script>
+<style>body{{margin:0;background:#fff}}</style>
+</head><body>'''
+    return head + render_widget(payload['items'],archive_month) + '</body></html>\n'
+
+
+def sitemap(payload: dict) -> str:
+    root = Element('urlset',xmlns='http://www.sitemaps.org/schemas/sitemap/0.9')
+    months = list(Counter(x['date'][:7] for x in payload['items']))
+    for key in ['',*months]:
+        items = [x for x in payload['items'] if not key or x['date'].startswith(key)]
+        entry = SubElement(root,'url')
+        SubElement(entry,'loc').text = month_url(key)
+        SubElement(entry,'lastmod').text = max(x['date'] for x in items)
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(root,encoding='unicode') + '\n'
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--refresh',action='store_true')
@@ -50,16 +113,16 @@ def main() -> None:
         refresh()
     result = build()
     data = json.loads((ROOT / 'data/sowhat_archive.json').read_text(encoding='utf-8'))
-    widget = (ROOT / 'widgets/sowhat-archives-code.txt').read_text(encoding='utf-8').replace('https://bestexit.co.kr/sowhat-archives',CANONICAL)
-    image = escape(data['items'][0].get('image',''),quote=True)
-    title = '쏘왓레터 모아보기 | 중기이코노미 · 베스트엑싯'
-    description = '중기이코노미 쏘왓레터의 지난 발행호를 대표이미지와 제목으로 만나보세요. 경제·기업·M&A·기업승계·세무 인사이트를 검색하고 발행월별로 살펴볼 수 있습니다.'
-    head = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{title}</title><meta name="description" content="{description}"><meta name="robots" content="index,follow"><link rel="canonical" href="{CANONICAL}"><meta property="og:type" content="website"><meta property="og:title" content="{title}"><meta property="og:description" content="{description}"><meta property="og:url" content="{CANONICAL}"><meta property="og:image" content="{image}"><meta name="twitter:card" content="summary_large_image"><style>body{{margin:0;background:#fff}}</style></head><body>'''
-    (ROOT / 'index.html').write_text(head+widget+'</body></html>\n',encoding='utf-8')
+    months = list(Counter(x['date'][:7] for x in data['items']))
+    for key in ['',*months]:
+        destination = ROOT / (key.replace('-','/') if key else '') / 'index.html'
+        destination.parent.mkdir(parents=True,exist_ok=True)
+        destination.write_text(render_page(data,key),encoding='utf-8')
     (ROOT / 'CNAME').write_text('sowhat.bestexit.co.kr\n',encoding='utf-8')
     (ROOT / '.nojekyll').write_text('',encoding='utf-8')
-    (ROOT / 'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: '+CANONICAL+'sitemap.xml\n',encoding='utf-8')
-    (ROOT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+CANONICAL+'</loc><lastmod>'+data['items'][0]['date']+'</lastmod></url></urlset>\n',encoding='utf-8')
+    (ROOT / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /widgets/\nSitemap: '+CANONICAL+'sitemap.xml\n',encoding='utf-8')
+    (ROOT / 'sitemap.xml').write_text(sitemap(data),encoding='utf-8')
+    result['pages'] = 1 + len(months)
     print(json.dumps(result))
 
 
