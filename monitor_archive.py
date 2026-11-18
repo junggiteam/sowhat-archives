@@ -1,7 +1,7 @@
-"""Read-only archive monitoring; notification delivery is handled by the scheduler.
+"""Read-only archive checks shared by local and GitHub-hosted monitoring.
 
 No Stibee account key, subscriber data, SMTP password, or mail recipient is stored.
-State stays local and notification acknowledgments are saved only after delivery.
+Notification acknowledgments are saved only after delivery.
 """
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 from html.parser import HTMLParser
 import json
+import os
 from pathlib import Path
 import re
 import urllib.request
@@ -62,7 +63,10 @@ def timestamp(value):
 
 
 def read_url(url):
-    request = urllib.request.Request(url,headers={'User-Agent':'BestExit-ArchiveMonitor/1.0 (+https://sowhat.bestexit.co.kr/)'})
+    headers = {'User-Agent':'BestExit-ArchiveMonitor/1.0 (+https://sowhat.bestexit.co.kr/)'}
+    if url.startswith('https://api.github.com/') and os.environ.get('GH_TOKEN'):
+        headers['Authorization'] = 'Bearer '+os.environ['GH_TOKEN']
+    request = urllib.request.Request(url,headers=headers)
     with urllib.request.urlopen(request,timeout=30) as response:
         return response.read().decode('utf-8-sig')
 
@@ -177,21 +181,8 @@ def save(path,data):
     temporary.replace(path)
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--state',type=Path,default=ROOT/'.monitor/state.json')
-    parser.add_argument('--ack-notification')
-    args = parser.parse_args()
-    state = json.loads(args.state.read_text(encoding='utf-8')) if args.state.exists() else {}
-    if args.ack_notification:
-        if args.ack_notification != state.get('lastReport',{}).get('fingerprint'):
-            raise ValueError('발송 확인 대상이 최근 점검 결과와 다릅니다.')
-        state['lastDeliveredFingerprint'] = args.ack_notification
-        state.pop('pendingDelivery',None)
-        save(args.state,state)
-        print(json.dumps({'deliveryAcknowledged':True}))
-        return
-    now = datetime.now(timezone.utc)
+def run_check(state, now=None):
+    now = now or datetime.now(timezone.utc)
     values, findings = collect(now)
     try:
         content_findings, counts = inspect(values,now)
@@ -211,6 +202,28 @@ def main():
         report['emailSubject'] = '[쏘왓레터] '+('자동 갱신 이상 감지' if report['event']=='problem' else '자동 갱신 정상 복구')
         report['emailBody'] = '\n'.join([report['emailSubject'],'사이트: '+BASE,'점검 시각(한국): '+now.astimezone(timezone(timedelta(hours=9))).strftime('%Y-%m-%d %H:%M'),'알림 ID: '+pending['id'],'',*sum(([x['message'],x['url'],''] for x in report['issues']),[]), '동일한 이상 상태는 중복 알리지 않으며, 정상 복구 시 한 번 안내합니다.'])
     state['lastReport'] = report
+    return report
+
+
+def acknowledge(state, fingerprint):
+    if fingerprint != state.get('lastReport',{}).get('fingerprint'):
+        raise ValueError('발송 확인 대상이 최근 점검 결과와 다릅니다.')
+    state['lastDeliveredFingerprint'] = fingerprint
+    state.pop('pendingDelivery',None)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--state',type=Path,default=ROOT/'.monitor/state.json')
+    parser.add_argument('--ack-notification')
+    args = parser.parse_args()
+    state = json.loads(args.state.read_text(encoding='utf-8')) if args.state.exists() else {}
+    if args.ack_notification:
+        acknowledge(state,args.ack_notification)
+        save(args.state,state)
+        print(json.dumps({'deliveryAcknowledged':True}))
+        return
+    report = run_check(state)
     save(args.state,state)
     print(json.dumps(report,ensure_ascii=False))
 

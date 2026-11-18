@@ -1,0 +1,44 @@
+name: Monitor So What archive
+
+on:
+  schedule:
+    - cron: '10 * * * *'
+  workflow_dispatch:
+    inputs:
+      send_test_email:
+        description: 'Send a Gmail connection test from GitHub'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sowhat-cloud-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate monitor and delivery behavior
+        run: python -m unittest discover -s tests -v
+      - name: Check public archive and send requested alerts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOWHAT_SMTP_USERNAME: ${{ secrets.SOWHAT_SMTP_USERNAME }}
+          SOWHAT_SMTP_PASSWORD: ${{ secrets.SOWHAT_SMTP_PASSWORD }}
+          SOWHAT_ALERT_TO: ${{ secrets.SOWHAT_ALERT_TO }}
+          SEND_TEST_EMAIL: ${{ inputs.send_test_email }}
+        shell: bash
+        run: |
+          args=()
+          if [ "$SEND_TEST_EMAIL" = "true" ]; then args+=(--test-email); fi
+          python -X utf8 cloud_monitor.py "${args[@]}"
