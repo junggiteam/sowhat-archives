@@ -2,7 +2,9 @@ name: Monitor So What archive
 
 on:
   schedule:
-    - cron: '10 * * * *'
+    # UTC: Korean business days at 15:10, 16:10, and 16:50.
+    - cron: '10 6,7 * * 1-5'
+    - cron: '50 7 * * 1-5'
   workflow_dispatch:
     inputs:
       send_test_email:
@@ -28,9 +30,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Skip weekends, Korean public holidays, and hours outside 15-17 KST
+        id: window
+        env:
+          BYPASS_SCHEDULE: ${{ github.event_name == 'workflow_dispatch' && inputs.send_test_email }}
+        run: python -X utf8 monitor_schedule.py
       - name: Validate monitor and delivery behavior
+        if: steps.window.outputs.allowed == 'true'
         run: python -m unittest discover -s tests -v
       - name: Check public archive and send requested alerts
+        if: steps.window.outputs.allowed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           SOWHAT_SMTP_USERNAME: ${{ secrets.SOWHAT_SMTP_USERNAME }}

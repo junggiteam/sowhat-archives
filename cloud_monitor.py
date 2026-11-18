@@ -141,7 +141,8 @@ def setup_message(report, run_id):
         '스티비 / 공통 데이터 / 검색용 HTML 발행호 수: '
         +' / '.join(str(counts.get(key,'확인 불가')) for key in ('sourceCount','feedCount','htmlCount')),
         '',
-        '컴퓨터와 Codex 앱을 꺼도 GitHub에서 매시간 10분에 점검합니다.',
+        '컴퓨터와 Codex 앱을 꺼도 평일 15:10·16:10·16:50(한국시간)에 GitHub에서 점검합니다.',
+        '토·일·공휴일 및 15~17시 외에는 자동 점검하지 않습니다.',
         'GitHub 예약 실행은 혼잡 시 지연될 수 있습니다.',
         'AI 모델·OpenAI API·Codex 토큰을 사용하지 않습니다.',
         '공개 저장소의 표준 Linux 실행기만 사용하며 유료 메일 서비스를 사용하지 않습니다.',
