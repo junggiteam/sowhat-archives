@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sowhat.bestexit.co.kr/sitemap.xml
