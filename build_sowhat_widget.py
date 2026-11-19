@@ -37,14 +37,13 @@ def render_widget(all_items: list[dict], archive_month: str = '') -> str:
     name = (month_name(archive_month) + ' ' if archive_month else '') + '쏘왓레터 모아보기'
     heading = '<span class="swa-title-letter">쏘왓레터</span><span class="swa-title-archive">모아보기</span>'
     intro = (
-        '경제 뉴스를 읽고도 “그래서 어쩌라고?(So What)” 싶으셨나요?',
-        '쏘왓레터는 복잡한 정보는 덜어내고, 바로 쓸 수 있는 ‘결론’만 전합니다.',
+        '경제 뉴스를 읽고도 “그래서 어쩌라고?(So What)” 싶으셨나요? 쏘왓레터는 복잡한 정보는 덜어내고, 바로 쓸 수 있는 ‘결론’만 전합니다.',
         '막연한 정보 대신 선명한 판단 기준, 지금 쏘왓레터로 받아보세요.',
     )
     description = ''.join(f'<p>{escape(line)}</p>' for line in intro)
     structured = {'@context':'https://schema.org','@type':'CollectionPage','@id':canonical+'#archive','name':name,'url':canonical,'inLanguage':'ko-KR','isPartOf':{'@id':BASE+'#website'},'mainEntity':{'@type':'ItemList','numberOfItems':len(data),'itemListElement':[{'@type':'ListItem','position':i+1,'item':{'@type':'CreativeWork','name':x['title'],'url':x['url'],'datePublished':x['date'],**({'image':x['image']} if x.get('image') else {})}} for i,x in enumerate(data)]}}
     template = (WIDGETS / 'sowhat-archive-template.html').read_text(encoding='utf-8')
-    label = month_name(archive_month) + ' 뉴스레터' if archive_month else '모든 뉴스레터'
+    label = month_name(archive_month) + ' 뉴스레터' if archive_month else '전체 뉴스레터'
     markup = template.replace('__CANONICAL__',canonical).replace('__ARCHIVE_MONTH__',archive_month).replace('__HEADING__',heading).replace('__DESCRIPTION__',description).replace('__GRID_LABEL__',label).replace('__COUNT__', str(len(data))).replace('__CARDS__','\n'.join(cards)).replace('__MONTH_LINKS__', month_links).replace('__DATA__', json.dumps(all_items,ensure_ascii=False).replace('<','\\u003c')).replace('__STRUCTURED__',json.dumps(structured,ensure_ascii=False).replace('<','\\u003c'))
     css = (WIDGETS / 'sowhat-archive.css').read_text(encoding='utf-8')
     js = (WIDGETS / 'sowhat-archive.js').read_text(encoding='utf-8')
