@@ -271,11 +271,10 @@
       }
     }
   });
-  const monthMenu = root.querySelector('[data-swa-month-menu]');
-  if (monthMenu) {
-    document.addEventListener('click', event => { if (monthMenu.open && !monthMenu.contains(event.target)) monthMenu.open = false; });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && monthMenu.open) { monthMenu.open = false; monthMenu.querySelector('summary').focus(); } });
-  }
+  const menus = Array.from(root.querySelectorAll('details[data-swa-menu]'));
+  menus.forEach(menu => menu.addEventListener('toggle', () => { if (menu.open) menus.forEach(other => { if (other !== menu) other.open = false; }); }));
+  document.addEventListener('click', event => { menus.forEach(menu => { if (menu.open && !menu.contains(event.target)) menu.open = false; }); });
+  document.addEventListener('keydown', event => { if (event.key !== 'Escape') return; menus.forEach(menu => { if (menu.open) { menu.open = false; menu.querySelector('summary').focus(); } }); });
   // Mobile: fixed '뉴스레터 구독하기' bar jumps to the subscribe box and hides while the box or footer is on screen.
   const stickyCta = root.querySelector('[data-swa-sticky-cta]');
   const subscribe = root.querySelector('#sowhat-subscribe-form');
