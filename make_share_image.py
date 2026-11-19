@@ -1,21 +1,24 @@
-"""Render the link-preview (Open Graph) card: assets/sowhat-og.png, 1200x630.
+"""Render the link-preview (Open Graph) card: assets/sowhat-og-v3.png, 1200x630.
 
-Run locally with Pillow. Uses the Noto Sans KR variable font that ships with
-Windows 11 and the wordmark logos in assets/. Scheduled builds do not need this.
+Photo background (assets/src/og-photo.webp) lightly darkened, centred three-line
+copy with a soft shadow. Run locally with Pillow; uses the Noto Sans KR variable
+font that ships with Windows 11. Scheduled builds do not need this.
+When the design changes, bump the file name (and build_site.py) so KakaoTalk
+and other messengers fetch the new image instead of a cached one.
 """
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parent
-NOTO = Path('C:/Windows/Fonts/NotoSansKR-VF.ttf')
-RED = '#d12f30'
-INK = '#15171b'
-GREY = '#6b707a'
-W, H = 1200, 630
+NOTO = 'C:/Windows/Fonts/NotoSansKR-VF.ttf'
+W, H, S = 1200, 630, 2
+BRIGHT_RED = (255, 92, 92)
+L1, L2A, L2B = '결론이 있는 뉴스레터', '중기이코노미 ', '쏘왓레터'
+SUB = '복잡한 정보는 덜어내고, 방향성 있는 결론만'
 
 
 def font(size, weight):
-    f = ImageFont.truetype(str(NOTO), size)
+    f = ImageFont.truetype(NOTO, size * S)
     try:
         f.set_variation_by_axes([weight])
     except Exception:
@@ -23,44 +26,62 @@ def font(size, weight):
     return f
 
 
+def photo(size):
+    im = Image.open(ROOT / 'assets/src/og-photo.webp').convert('RGB')
+    tw, th = size
+    scale = max(tw / im.width, th / im.height)
+    im = im.resize((round(im.width * scale), round(im.height * scale)), Image.LANCZOS)
+    left, top = (im.width - tw) // 2, (im.height - th) // 2
+    return im.crop((left, top, left + tw, top + th))
+
+
+def radial(size, inner_alpha, outer_alpha):
+    """Darker behind the text in the centre, lighter towards the edges."""
+    small = Image.new('L', (120, 63))
+    px = small.load()
+    for y in range(63):
+        for x in range(120):
+            dx, dy = (x - 59.5) / 60, (y - 31) / 34
+            t = min(1, (dx * dx + dy * dy) ** 0.5)
+            px[x, y] = round(inner_alpha + (outer_alpha - inner_alpha) * t)
+    layer = Image.new('RGBA', size, (10, 14, 22, 0))
+    layer.putalpha(small.resize(size, Image.BICUBIC))
+    return layer
+
+
 def main():
-    # Draw at 2x and downsample for smooth edges.
-    s = 2
-    canvas = Image.new('RGB', (W * s, H * s), '#ffffff')
-    draw = ImageDraw.Draw(canvas)
+    base = photo((W * S, H * S)).convert('RGBA')
+    base.alpha_composite(Image.new('RGBA', base.size, (10, 14, 22, 70)))
+    base.alpha_composite(radial(base.size, 120, 20))
 
-    # Red accent bar along the top edge.
-    draw.rectangle((0, 0, W * s, 14 * s), fill=RED)
+    head, sub = font(88, 800), font(34, 500)
+    d = ImageDraw.Draw(base)
+    hb = d.textbbox((0, 0), L1, font=head)
+    sb = d.textbbox((0, 0), SUB, font=sub)
+    hh, sh = hb[3] - hb[1], sb[3] - sb[1]
+    gap, sub_gap = 18 * S, 40 * S
+    top = (H * S - (hh * 2 + gap + sub_gap + sh)) // 2
+    cx = W * S // 2
+    y2 = top + hh + gap
+    y3 = y2 + hh + sub_gap
+    lines = [(L1, head, top - hb[1]), (L2A + L2B, head, y2 - hb[1]), (SUB, sub, y3 - sb[1])]
 
-    # Decorative question mark on the right, kept fully inside the frame
-    # (messengers crop previews slightly at the top and bottom).
-    qfont = font(470 * s, 900)
-    box = draw.textbbox((0, 0), '?', font=qfont)
-    qh = box[3] - box[1]
-    qx = (W - 70) * s - (box[2] - box[0]) - box[0]
-    qy = (H * s - qh) // 2 - box[1] - 42 * s
-    draw.text((qx, qy), '?', font=qfont, fill='#eff1f4')
+    # Soft shadow so the text stays crisp over the bright newspapers.
+    shadow = Image.new('RGBA', base.size, (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow)
+    for text, f, y in lines:
+        sd.text((cx - sd.textlength(text, font=f) / 2, y + 3 * S), text, font=f, fill=(0, 0, 0, 170))
+    base.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(7 * S)))
 
-    # Three lines, vertically centred as one block.
-    x = 92
-    head = font(104 * s, 800)
-    sub = font(40 * s, 500)
-    line_gap, sub_gap = 18, 44
-    hb = draw.textbbox((0, 0), '결론이 있는 뉴스레터', font=head)
-    sb = draw.textbbox((0, 0), '복잡한 정보는 덜어내고', font=sub)
-    head_h, sub_h = hb[3] - hb[1], sb[3] - sb[1]
-    block = head_h * 2 + line_gap * s + sub_gap * s + sub_h
-    top = (H * s - block) // 2 + 6 * s
-    draw.text((x * s, top - hb[1]), '결론이 있는 뉴스레터', font=head, fill=INK)
-    y2 = top + head_h + line_gap * s
-    first = '중기이코노미 '
-    draw.text((x * s, y2 - hb[1]), first, font=head, fill=INK)
-    draw.text((x * s + draw.textlength(first, font=head), y2 - hb[1]), '쏘왓레터', font=head, fill=RED)
-    y3 = y2 + head_h + sub_gap * s
-    draw.text((x * s, y3 - sb[1]), '복잡한 정보는 덜어내고, 방향성 있는 결론만', font=sub, fill=GREY)
+    d = ImageDraw.Draw(base)
+    d.text((cx - d.textlength(L1, font=head) / 2, top - hb[1]), L1, font=head, fill=(255, 255, 255))
+    w2 = d.textlength(L2A + L2B, font=head)
+    d.text((cx - w2 / 2, y2 - hb[1]), L2A, font=head, fill=(255, 255, 255))
+    d.text((cx - w2 / 2 + d.textlength(L2A, font=head), y2 - hb[1]), L2B, font=head, fill=BRIGHT_RED)
+    d.text((cx - d.textlength(SUB, font=sub) / 2, y3 - sb[1]), SUB, font=sub, fill=(226, 230, 235))
 
-    out = canvas.resize((W, H), Image.LANCZOS)
-    target = ROOT / 'assets/sowhat-og-v2.png'  # new name per design change so messengers refetch
+    out = base.convert('RGB').resize((W, H), Image.LANCZOS)
+    target = ROOT / 'assets/sowhat-og-v3.png'
     out.save(target, optimize=True)
     print(target, out.size)
 
