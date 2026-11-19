@@ -1,6 +1,10 @@
 name: Refresh So What archive site
 
+# Started by the sowhat-cron Cloudflare Worker on Korean business days
+# (16:10 16:30 16:50 17:10 17:40 18:10, and 09:10 to catch up). GitHub cron was
+# unreliable (runs hours apart), so there is no schedule here.
 on:
+  # Temporary backup until the sowhat-cron GitHub key is installed; then removed.
   schedule:
     - cron: '19,49 * * * *'
   workflow_dispatch:
@@ -30,7 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add index.html data/sowhat_archive.json widgets/sowhat-archives-code.txt widgets/sowhat-archives-preview.html CNAME robots.txt sitemap.xml .nojekyll [0-9][0-9][0-9][0-9]/*/index.html
+          git add index.html data/sowhat_archive.json widgets/sowhat-archives-code.txt widgets/sowhat-archives-preview.html CNAME robots.txt sitemap.xml .nojekyll [0-9][0-9][0-9][0-9]/*/index.html read/index.html
           if git diff --staged --quiet; then exit 0; fi
           git config user.name "junggiteam"
           git config user.email "junggiteam@gmail.com"

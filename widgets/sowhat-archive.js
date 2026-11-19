@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  // Today's date (Asia/Seoul) and rolling weather for major cities: KMA first, Open-Meteo as a fallback.
+  // Today's date (Asia/Seoul) and rolling KMA weather for major cities (hidden only if the KMA data is stale).
   const box = document.querySelector('#sowhat-archive [data-swa-today]');
   if (!box || box.dataset.ready) return;
   box.dataset.ready = 'true';
@@ -31,10 +31,9 @@
     thunder: svg(cloud(-3) + '<path stroke="#e2a400" fill="#ffd25e" d="m12.5 15-2.5 4h3l-1.5 4"/>')
   };
   const thermometer = '<svg class="swa-temp-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0Z"/><path d="M12 9v7"/></svg>';
-  const cities = [['서울', 37.5665, 126.978], ['인천', 37.4563, 126.7052], ['대전', 36.3504, 127.3845], ['광주', 35.1595, 126.8526], ['대구', 35.8714, 128.6014], ['울산', 35.5384, 129.3114], ['부산', 35.1796, 129.0756], ['제주', 33.4996, 126.5312]];
-  const kmaUrl = 'https://raw.githubusercontent.com/junggiteam/sowhat-archives/weather/weather.json';
+  const kmaUrl = 'https://sowhat-cron.junggiteam.workers.dev/weather.json';
   const seoulHour = () => Number(new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Seoul', hour: 'numeric', hourCycle: 'h23'}).format(new Date()));
-  // 기상청 초단기실황·예보 (published to the weather branch by GitHub Actions).
+  // 기상청 초단기실황·예보 (refreshed every 30 minutes by the sowhat-cron Cloudflare Worker).
   function fromKma(payload) {
     if (!payload || payload.schemaVersion !== 2 || payload.source !== 'kma' || !Array.isArray(payload.cities)) return [];
     const updated = Date.parse(payload.updatedAt);
@@ -50,24 +49,6 @@
       else if (d.sky === 3) info = ['partly', '구름많음'];
       else if (d.sky === 4) info = ['cloudy', '흐림'];
       return info && {icon: info[0], label: info[1], temperature: d.temperature, place: String(d.place || '').slice(0, 6)};
-    }).filter(Boolean);
-  }
-  // Fallback when the KMA file is unavailable or stale: keyless Open-Meteo (WMO codes).
-  function fromOpenMeteo(payload) {
-    const list = Array.isArray(payload) ? payload : [payload];
-    return list.map((entry, i) => {
-      const current = entry && entry.current;
-      const code = Number(current && current.weather_code);
-      const day = current && current.is_day !== 0;
-      let info = null;
-      if (code === 0 || code === 1) info = [day ? 'clear' : 'night', '맑음'];
-      else if (code === 2) info = ['partly', '구름많음'];
-      else if (code === 3) info = ['cloudy', '흐림'];
-      else if (code === 45 || code === 48) info = ['fog', '안개'];
-      else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) info = ['rain', '비'];
-      else if ((code >= 71 && code <= 77) || code === 85 || code === 86) info = ['snow', '눈'];
-      else if (code >= 95 && code <= 99) info = ['thunder', '뇌우'];
-      return info && cities[i] && {icon: info[0], label: info[1], temperature: current.temperature_2m, place: cities[i][0]};
     }).filter(Boolean);
   }
   const valid = view => view && Number.isFinite(Number(view.temperature)) && icons[view.icon] && view.place;
@@ -144,7 +125,7 @@
       return await response.json();
     } finally { clearTimeout(timer); }
   }
-  const cacheKey = 'swa-weather-v3';
+  const cacheKey = 'swa-weather-v4';
   const maxAge = 20 * 60 * 1000;
   let loading = false;
   async function loadWeather() {
@@ -156,11 +137,8 @@
     loading = true;
     let list = [];
     try { list = fromKma(await getJson(kmaUrl + '?v=' + Math.floor(Date.now() / 600000))); } catch (_) {}
-    if (!list.length) {
-      const lat = cities.map(c => c[1]).join(','), lon = cities.map(c => c[2]).join(',');
-      try { list = fromOpenMeteo(await getJson('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m,weather_code,is_day&timezone=Asia%2FSeoul')); } catch (_) {}
-    }
     if (setViews(list)) { try { localStorage.setItem(cacheKey, JSON.stringify({views: views, at: Date.now()})); } catch (_) {} }
+    else { views = []; weather.hidden = true; } // KMA data missing or older than 3 hours
     loading = false;
   }
   showDate();
@@ -270,7 +248,9 @@
   }
   function render() {
     const query = search.value.trim().toLocaleLowerCase();
-    const items = dataset.filter(x => (!query || (x.title + ' ' + (x.volume || '')).toLocaleLowerCase().includes(query)));
+    // '115', '115호', 'Vol.115', 'Vol. 115', 'vol115' all mean issue 115.
+    const vol = /^(?:vol\.?\s*)?0*(\d{1,4})\s*호?$/i.exec(query);
+    const items = dataset.filter(x => !query || (vol && x.volume === Number(vol[1])) || x.title.toLocaleLowerCase().includes(query));
     const fragment = document.createDocumentFragment();
     items.slice(0, limit).forEach((x, i) => fragment.append(card(x, i)));
     grid.replaceChildren(fragment);
@@ -305,16 +285,13 @@
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       subscribe.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
     });
-    if ('IntersectionObserver' in window) {
-      const visible = new Set();
-      const watch = new IntersectionObserver(entries => {
-        entries.forEach(entry => { if (entry.isIntersecting) visible.add(entry.target); else visible.delete(entry.target); });
-        stickyCta.classList.toggle('is-hidden', visible.size > 0);
-      }, { threshold: 0.15 });
-      watch.observe(subscribe);
-      const footer = root.querySelector('.swa-footer');
-      if (footer) watch.observe(footer);
-    }
+    // Hide while the subscribe box or the footer is on screen (checked on scroll so it never covers them).
+    const pageFoot = root.querySelector('.swa-footer');
+    const near = el => { if (!el) return false; const r = el.getBoundingClientRect(); return r.top < window.innerHeight + 120 && r.bottom > 0; };
+    const updateCta = () => stickyCta.classList.toggle('is-hidden', near(subscribe) || near(pageFoot));
+    window.addEventListener('scroll', updateCta, { passive: true });
+    window.addEventListener('resize', updateCta, { passive: true });
+    updateCta();
   }
   const mobileReader = window.matchMedia ? window.matchMedia('(max-width: 820px)') : null;
   grid.addEventListener('click', event => {
@@ -323,6 +300,8 @@
     const match = link && /^https:\/\/stib\.ee\/([A-Za-z0-9_-]+)$/.exec(link.href);
     if (!match) return;
     event.preventDefault();
+    // Remember how far the list was opened so the back bar returns to the same place.
+    try { sessionStorage.setItem('swa-return:' + location.pathname, JSON.stringify({ limit, query: search.value, y: window.scrollY, at: Date.now() })); } catch (_) {}
     const sameSite = location.hostname === new URL(archiveBase).hostname || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
     location.assign((sameSite ? '/' : archiveBase) + 'read/?id=' + encodeURIComponent(match[1]));
   });
@@ -354,7 +333,14 @@
   const toTop = root.querySelector('[data-swa-totop]');
   if (toTop) {
     toTop.hidden = false;
-    const updateTop = () => toTop.classList.toggle('is-visible', window.scrollY > 400);
+    const pageFooter = root.querySelector('.swa-footer');
+    const updateTop = () => {
+      toTop.classList.toggle('is-visible', window.scrollY > 400);
+      // Lift the button above the footer so it never covers the footer text.
+      const overlap = pageFooter ? window.innerHeight - pageFooter.getBoundingClientRect().top : 0;
+      toTop.style.bottom = overlap > 0 ? (overlap + 16) + 'px' : '';
+    };
+    window.addEventListener('resize', updateTop, { passive: true });
     window.addEventListener('scroll', updateTop, { passive: true });
     updateTop();
     toTop.addEventListener('click', event => {
@@ -364,6 +350,16 @@
     });
   }
   rebuildMonths();
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('swa-return:' + location.pathname) || 'null');
+    if (saved && Date.now() - saved.at < 30 * 60 * 1000) {
+      limit = Math.max(9, Math.min(Number(saved.limit) || 9, 200));
+      search.value = typeof saved.query === 'string' ? saved.query.slice(0, 60) : '';
+      window.addEventListener('load', () => setTimeout(() => window.scrollTo(0, Number(saved.y) || 0), 0), { once: true });
+      if (document.readyState === 'complete') setTimeout(() => window.scrollTo(0, Number(saved.y) || 0), 0);
+    }
+    sessionStorage.removeItem('swa-return:' + location.pathname);
+  } catch (_) {}
   render();
   currentSignature = JSON.stringify(allItems);
 

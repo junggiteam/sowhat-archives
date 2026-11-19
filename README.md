@@ -13,13 +13,15 @@
 - 공유 이미지: `assets/sowhat-og-v4.png` (배경 사진 `assets/src/og-photo.webp`) (디자인을 바꾸면 파일 이름도 바꿔 카카오톡·SNS 캐시를 피함) (1200×630). 원본 생성 코드는 `make_share_image.py`이며 로컬 Windows(Noto Sans KR)/Pillow로 렌더링합니다. 대표 페이지의 공유 제목·설명은 브랜드 문구, 검색 제목·설명은 키워드 중심으로 따로 둡니다. 자동 갱신에는 Pillow가 필요 없습니다.
 - 네이버 소유 확인용 공개 메타 태그는 `site-verification.json`에서 읽어 매번 생성합니다. 이 값은 공개 HTML에 게시하는 소유 확인 값이며 로그인 비밀키가 아닙니다.
 
-- 상단 날짜·날씨: 날짜는 브라우저가 한국시간으로 표시합니다. 날씨는 GitHub Actions `Update Seoul weather`(`.github/workflows/weather.yml`, 매시 7분·37분)가 기상청 단기예보 조회서비스(초단기실황·초단기예보)에서 서울·인천·대전·광주·대구·울산·부산·제주를 받아 별도 `weather` 브랜치의 `weather.json`에 저장하고, 화면은 4초마다 도시를 넘겨 보여 줍니다. 공공데이터포털 인증키는 repository secret `KMA_SERVICE_KEY`에서만 읽으며 공개 파일에 넣지 않습니다. `weather` 브랜치는 한 개 커밋으로 덮어쓰므로 main 배포를 일으키지 않습니다. 기상청 자료가 3시간 넘게 갱신되지 않으면 키가 필요 없는 Open-Meteo로 대신 표시합니다.
+- 상단 날짜·날씨: 날짜는 브라우저가 한국시간으로 표시합니다. 날씨는 Cloudflare Worker `sowhat-cron`(코드 `Desktop/sowhat-cron`, junggiteam 계정)이 30분마다 기상청 단기예보 조회서비스에서 8개 도시를 받아 KV에 저장하고 `https://sowhat-cron.junggiteam.workers.dev/weather.json`으로 제공합니다. 기상청 자료가 3시간 넘게 갱신되지 않으면(서버 점검 등) 날씨 칸만 숨깁니다. 인증키는 Worker 비밀값 `KMA_SERVICE_KEY`에만 있습니다.
 
 로컬 빌드: `python build_site.py`
 
 공개 데이터 갱신 후 빌드: `python build_site.py --refresh`
 
-운영 점검과 이메일 알림은 GitHub Actions의 `Monitor So What archive`가 한국시간 평일 16:00·16:30·17:30에 실행합니다. 토·일·공휴일에는 실제 아카이브 점검을 하지 않습니다. 컴퓨터와 Codex 앱은 꺼도 됩니다. GitHub 예약 실행은 혼잡 시 지연될 수 있습니다. 마지막 17:30 예약이 약간 지연되어도 실행되도록 시간 확인은 18시까지 허용하되, 추가 예약은 만들지 않습니다.
+자동 반영 일정: `sowhat-cron`이 한국 영업일(주말·공휴일 제외) 16:00·16:20·16:40·17:00·17:30·18:00에 스티비 수집(naver-news `sowhat_archive.yml`)을, 10분 뒤 사이트 빌드(`refresh.yml`)를 실행하고, 다음 영업일 09:00/09:10에 전날 누락분을 다시 반영합니다. GitHub 접근 키는 Worker 비밀값 `GITHUB_TOKEN`(Actions 쓰기, 두 저장소 한정)에 있습니다. 알림 메일과 정기 점검은 2026-11-19에 껐습니다. 아래 점검 코드는 수동 실행용으로 남아 있습니다.
+
+(이전 기록) 운영 점검과 이메일 알림은 GitHub Actions의 `Monitor So What archive`가 한국시간 평일 16:00·16:30·17:30에 실행합니다. 토·일·공휴일에는 실제 아카이브 점검을 하지 않습니다. 컴퓨터와 Codex 앱은 꺼도 됩니다. GitHub 예약 실행은 혼잡 시 지연될 수 있습니다. 마지막 17:30 예약이 약간 지연되어도 실행되도록 시간 확인은 18시까지 허용하되, 추가 예약은 만들지 않습니다.
 
 - 스티비 공개 발행 목록과 공통 JSON·공개 HTML·사이트맵을 비교하며 최신 대표이미지, 수집 실패 및 6시간 이상 실행 중단도 확인합니다.
 - 발행호·제목·검색용 HTML의 미반영은 첫 발견 후 90분의 유예를 둡니다. 일시적인 접근 오류는 30분 유예 후 경고합니다.

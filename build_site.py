@@ -47,7 +47,7 @@ def refresh() -> None:
 def page_title(archive_month: str) -> str:
     if archive_month:
         return month_name(archive_month) + ' 경제·경영 뉴스레터 모아보기 | 쏘왓레터'
-    return '쏘왓레터 | 경제뉴스레터·경영뉴스레터 - 중기이코노미'
+    return '쏘왓레터 | 결론이 있는 경제·경영 뉴스레터 - 중기이코노미'
 
 
 def render_page(payload: dict, archive_month: str = '') -> str:

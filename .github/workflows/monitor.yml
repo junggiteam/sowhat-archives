@@ -1,10 +1,9 @@
 name: Monitor So What archive
 
+# Manual only. Scheduled checks and alert e-mails were turned off on 2026-11-19:
+# each refresh slot re-collects anything missed, and the next business day
+# 09:00 run catches up.
 on:
-  schedule:
-    # UTC: Korean business days at 16:00, 16:30, and 17:30.
-    - cron: '0 7 * * 1-5'
-    - cron: '30 7,8 * * 1-5'
   workflow_dispatch:
     inputs:
       send_test_email:
