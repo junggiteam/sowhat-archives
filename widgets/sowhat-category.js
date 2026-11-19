@@ -16,7 +16,9 @@
   let shown = STEP;
   const apply = () => {
     rows.forEach((row, i) => { row.hidden = i >= shown; });
-    if (bottom) bottom.hidden = rows.length <= shown;
+    const done = rows.length <= shown;
+    if (more) more.hidden = done;
+    if (bottom) bottom.classList.toggle('is-done', done);
   };
   apply();
   if (more) more.addEventListener('click', () => {
@@ -33,7 +35,7 @@
   const list = root.querySelector('[data-swa-cat-list]');
   if (back && list) {
     const updateBack = () => {
-      const end = (bottom && !bottom.hidden ? bottom : list).getBoundingClientRect().bottom;
+      const end = (bottom && !bottom.classList.contains('is-done') ? bottom : list).getBoundingClientRect().bottom;
       back.classList.toggle('is-shown', end < window.innerHeight + 40);
     };
     window.addEventListener('scroll', updateBack, { passive: true });
@@ -54,7 +56,11 @@
     toTop.hidden = false;
     const update = () => {
       toTop.classList.toggle('is-visible', window.scrollY > 400);
-      const overlap = foot ? window.innerHeight - foot.getBoundingClientRect().top : 0;
+      // stay above the footer and, on PC, above the '← 쏘왓레터 모아보기' button
+      const home = root.querySelector('.swa-cat-home');
+      const tops = [foot && foot.getBoundingClientRect().top];
+      if (home && home.offsetParent) tops.push(home.getBoundingClientRect().top);
+      const overlap = Math.max(0, ...tops.filter(Boolean).map(t => window.innerHeight - t));
       toTop.style.bottom = overlap > 0 ? (overlap + 16) + 'px' : '';
     };
     window.addEventListener('scroll', update, { passive: true });
