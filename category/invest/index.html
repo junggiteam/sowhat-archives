@@ -210,8 +210,11 @@
 /* PC: '← 쏘왓레터 모아보기' at the right end of the more row, as wide as the thumbnails */
 #sowhat-archive .swa-cat-end{position:relative;min-height:46px}
 #sowhat-archive .swa-cat-end .swa-more[hidden]{display:none}
-#sowhat-archive .swa-cat-home{position:absolute;right:0;top:0;width:190px;height:46px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;background:#d12f30;color:#fff;font-size:15px;font-weight:700;letter-spacing:-.02em;transition:background .15s}
-#sowhat-archive .swa-cat-home:hover{background:#b8282a}
+#sowhat-archive .swa-cat-home{position:absolute;right:0;top:0;width:190px;height:46px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;background:#d12f30;color:#fff;font-size:15px;font-weight:700;letter-spacing:-.02em}
+/* hover: no colour change, the arrow slides back and forth (like bestexit.co.kr/bizcup01 cards) */
+@keyframes swaBackArrow{from{transform:translateX(0)}to{transform:translateX(-6px)}}
+@media(hover:hover){#sowhat-archive .swa-cat-home:hover svg,#sowhat-archive .swa-cat-home:focus-visible svg{animation:swaBackArrow .8s ease-in-out infinite alternate}}
+@media(prefers-reduced-motion:reduce){#sowhat-archive .swa-cat-home:hover svg{animation:none}}
 #sowhat-archive .swa-cat-home svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:900px){#sowhat-archive .swa-cat-home{width:150px;font-size:14px}}
 @media(max-width:820px){#sowhat-archive .swa-cat-home{display:none}#sowhat-archive .swa-cat-end.is-done{display:none}}
