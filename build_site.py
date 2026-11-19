@@ -152,7 +152,7 @@ def render_category_page(payload: dict, cache: dict, label: str) -> str:
             f'<nav class="swa-cat-tabs" aria-label="카테고리">{tabs}</nav>'
             f'<ol class="swa-cat-list" data-swa-cat-list>{"".join(items_html)}</ol>'
             '<div class="swa-bottom" data-swa-cat-bottom hidden><button class="swa-more" type="button" data-swa-cat-more>지난 글 <span class="swa-more-accent">더 보기 +</span></button></div>'
-            '</main>' + footer + totop + '</div>')
+            '</main>' + footer + totop + f'<a class="swa-cat-back" href="{CANONICAL}" data-swa-cat-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>쏘왓레터 모아보기로 가기</a>' + '</div>')
     css = (ROOT / 'widgets/sowhat-archive.css').read_text(encoding='utf-8') + (ROOT / 'widgets/sowhat-category.css').read_text(encoding='utf-8')
     js = (ROOT / 'widgets/sowhat-archive.js').read_text(encoding='utf-8') + (ROOT / 'widgets/sowhat-category.js').read_text(encoding='utf-8')
     return head + '<style>\n' + css + '\n</style>\n' + body + '\n<script>\n' + js + '\n</script>\n</body></html>\n'

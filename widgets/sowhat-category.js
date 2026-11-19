@@ -28,6 +28,26 @@
       window.scrollTo({ top: rows[firstNew].getBoundingClientRect().top + window.scrollY - 16, behavior: reduce ? 'auto' : 'smooth' });
     }
   });
+  // Mobile: the red "back to the archive" bar slides up once the reader reaches the end of the list.
+  const back = root.querySelector('[data-swa-cat-back]');
+  const list = root.querySelector('[data-swa-cat-list]');
+  if (back && list) {
+    const updateBack = () => {
+      const end = (bottom && !bottom.hidden ? bottom : list).getBoundingClientRect().bottom;
+      back.classList.toggle('is-shown', end < window.innerHeight + 40);
+    };
+    window.addEventListener('scroll', updateBack, { passive: true });
+    window.addEventListener('resize', updateBack, { passive: true });
+    if (more) more.addEventListener('click', () => requestAnimationFrame(updateBack));
+    updateBack();
+  }
+  // Mobile: shadow under the category tabs once they stick to the top.
+  if (tabs && window.IntersectionObserver) {
+    const probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    tabs.parentNode.insertBefore(probe, tabs);
+    new IntersectionObserver(([entry]) => tabs.classList.toggle('is-stuck', !entry.isIntersecting)).observe(probe);
+  }
   const toTop = root.querySelector('.swa-totop');
   const foot = root.querySelector('.swa-footer');
   if (toTop) {

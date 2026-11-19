@@ -98,15 +98,17 @@ def write_issue_page(item: dict, document: str) -> None:
     head = (f'{ISSUE_START}<meta name="robots" content="noindex,follow">'
             f'<link rel="canonical" href="{item["url"]}">{ISSUE_END}')
     tail = (ISSUE_START +
-            '<style>.swa-issue-bar{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;background:#fff;'
-            'border-top:1px solid #e5e7eb;text-align:center;padding:13px 16px calc(13px + env(safe-area-inset-bottom));'
-            "font:600 15px/1.4 Pretendard,'Noto Sans KR','Malgun Gothic',sans-serif;letter-spacing:-.02em}"
-            '.swa-issue-bar a{color:#1b1d22!important;text-decoration:none!important}.swa-issue-bar a:hover{color:#d12f30!important}'
-            'body{padding-bottom:64px!important}</style>'
-            f'<div class="swa-issue-bar"><a href="{SITE}" data-swa-back>← 쏘왓레터 모아보기로 가기</a></div>'
+            '<style>.swa-issue-bar{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;gap:8px;'
+            'min-height:56px;box-sizing:border-box;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:#d12f30;color:#fff!important;'
+            "font:800 17px/1.4 Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;letter-spacing:-.03em;"
+            'text-decoration:none!important;box-shadow:0 -4px 16px rgba(25,32,48,.12)}'
+            '.swa-issue-bar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}'
+            # like the volume reader: the newsletter's own bottom padding runs under the bar
+            'body{padding-bottom:0!important}.stb-container-full{padding-bottom:64px!important}</style>'
+            f'<a class="swa-issue-bar" href="{SITE}" data-swa-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>쏘왓레터 모아보기로 가기</span></a>'
             '<script>(function(){var L=' + json.dumps(labels, ensure_ascii=False) + ',S="' + SITE + '";'
             'var m=/(?:^|&)c=([a-z]+)/.exec(location.hash.slice(1));var label=m&&L[m[1]];if(!label)return;'
-            'var back=document.querySelector("[data-swa-back]");if(back){back.href=S+"category/"+m[1]+"/";back.textContent="← "+label+" 모아보기로 가기";}'
+            'var back=document.querySelector("[data-swa-back]");if(back){back.href=S+"category/"+m[1]+"/";back.lastChild.textContent=label+" 모아보기로 가기";}'
             'function find(){var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,c=0;'
             'while((n=w.nextNode())){if(n.nodeValue.replace(/\\s+/g," ").trim()===label&&++c===2)return n.parentElement;}return null}'
             'var done=false;function go(){if(done)return;var el=find();if(!el)return;'
