@@ -28,6 +28,8 @@ CATEGORIES = [
     ('TAX', 'tax', '기업과 대표가 알아야 할 세금 이슈와 절세 포인트를 모았습니다.'),
     ('재테크', 'wealth', '자산을 지키고 불리는 데 필요한 재테크 정보를 모았습니다.'),
 ]
+ISSUE_DIR = ROOT / 'issue'  # hosted copy of each issue: issue/<volume>/index.html
+SITE = 'https://sowhat.bestexit.co.kr/'
 IMAGE_HOSTS = ('https://img.stibee.com/', 'https://img2.stibee.com/', 'https://resource.stibee.com/')
 
 
@@ -72,6 +74,60 @@ def extract(document: str) -> list[dict]:
     return result
 
 
+ISSUE_START, ISSUE_END = '<!--swa-issue-->', '<!--/swa-issue-->'
+
+
+def issue_path(volume: int) -> Path:
+    return ISSUE_DIR / str(volume) / 'index.html'
+
+
+def issue_url(volume: int, slug: str) -> str:
+    """Hosted copy that opens with that category's section heading at the top."""
+    return f'{SITE}issue/{volume}/#c={slug}'
+
+
+def write_issue_page(item: dict, document: str) -> None:
+    """Save the public Stibee web version with a small jump script and a back bar.
+
+    The Stibee page lists every section twice (contents, then the section), and a
+    browser text fragment can only centre the first match, so we host a copy and
+    scroll to the second occurrence of the label ourselves.
+    """
+    document = re.sub(re.escape(ISSUE_START) + '.*?' + re.escape(ISSUE_END), '', document, flags=re.S)
+    labels = {slug: label for label, slug, _ in CATEGORIES}
+    head = (f'{ISSUE_START}<meta name="robots" content="noindex,follow">'
+            f'<link rel="canonical" href="{item["url"]}">{ISSUE_END}')
+    tail = (ISSUE_START +
+            '<style>.swa-issue-bar{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;background:#fff;'
+            'border-top:1px solid #e5e7eb;text-align:center;padding:13px 16px calc(13px + env(safe-area-inset-bottom));'
+            "font:600 15px/1.4 Pretendard,'Noto Sans KR','Malgun Gothic',sans-serif;letter-spacing:-.02em}"
+            '.swa-issue-bar a{color:#1b1d22!important;text-decoration:none!important}.swa-issue-bar a:hover{color:#d12f30!important}'
+            'body{padding-bottom:64px!important}</style>'
+            f'<div class="swa-issue-bar"><a href="{SITE}" data-swa-back>← 쏘왓레터 모아보기로 가기</a></div>'
+            '<script>(function(){var L=' + json.dumps(labels, ensure_ascii=False) + ',S="' + SITE + '";'
+            'var m=/(?:^|&)c=([a-z]+)/.exec(location.hash.slice(1));var label=m&&L[m[1]];if(!label)return;'
+            'var back=document.querySelector("[data-swa-back]");if(back){back.href=S+"category/"+m[1]+"/";back.textContent="← "+label+" 모아보기로 가기";}'
+            'function find(){var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,c=0;'
+            'while((n=w.nextNode())){if(n.nodeValue.replace(/\\s+/g," ").trim()===label&&++c===2)return n.parentElement;}return null}'
+            'var done=false;function go(){if(done)return;var el=find();if(!el)return;'
+            'window.scrollTo(0,Math.max(0,el.getBoundingClientRect().top+(window.pageYOffset||0)-16));}'
+            'function stop(){done=true}["wheel","touchstart","keydown","mousedown"].forEach(function(e){window.addEventListener(e,stop,{passive:true})});'
+            'if("scrollRestoration" in history)history.scrollRestoration="manual";'
+            'go();Array.prototype.forEach.call(document.images,function(i){if(!i.complete)i.addEventListener("load",go)});'
+            'window.addEventListener("load",function(){go();setTimeout(go,300);setTimeout(stop,1500)});setTimeout(stop,8000);})();</script>'
+            + ISSUE_END)
+    # Root-relative assets (Stibee's page stylesheet) must keep loading from stibee.com.
+    document = re.sub(r'(\s(?:src|href)=")/(?!/)', r'\1https://stibee.com/', document)
+    document = document.replace('</head>', head + '</head>', 1)
+    # The Stibee page nests the e-mail document (with its own </body>) inside the page
+    # and its script keeps only the e-mail container, so append to the outer body.
+    cut = document.rfind('</body>')
+    document = document[:cut] + tail + document[cut:] if cut >= 0 else document + tail
+    path = issue_path(item['volume'])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(document, encoding='utf-8')
+
+
 def load_cache() -> dict:
     if CACHE.exists():
         return json.loads(CACHE.read_text(encoding='utf-8'))
@@ -84,18 +140,23 @@ def update(items: list[dict], fetch: bool) -> dict:
     issues = cache.setdefault('issues', {})
     changed = False
     for item in items:
-        if not item.get('volume') or item['volume'] < MIN_VOLUME or item['id'] in issues or not fetch:
+        if not fetch or not item.get('volume') or item['volume'] < MIN_VOLUME:
+            continue
+        if item['id'] in issues and issue_path(item['volume']).exists():
             continue
         try:
             req = urllib.request.Request(item['url'], headers={'User-Agent': 'Mozilla/5.0 (SoWhatArchive)'})
             with urllib.request.urlopen(req, timeout=30) as response:
-                sections = extract(response.read().decode('utf-8', 'replace'))
+                document = response.read().decode('utf-8', 'replace')
         except Exception:
             continue
+        sections = extract(document)
         if not sections:
             continue
-        issues[item['id']] = {'volume': item['volume'], 'date': item['date'], 'url': item['url'], 'sections': sections}
-        changed = True
+        write_issue_page(item, document)
+        if item['id'] not in issues:
+            issues[item['id']] = {'volume': item['volume'], 'date': item['date'], 'url': item['url'], 'sections': sections}
+            changed = True
         time.sleep(0.3)
     if changed:
         CACHE.parent.mkdir(exist_ok=True)

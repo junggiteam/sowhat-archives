@@ -137,11 +137,12 @@ def render_category_page(payload: dict, cache: dict, label: str) -> str:
     tabs = ''.join(f'<a class="swa-cat-tab" href="{category_url(s2)}"' + (' aria-current="page"' if l == label else '') + f'>{escape(l)}</a>' for l, s2, _ in sowhat_sections.CATEGORIES)
     items_html = []
     for it, sec in rows:
-        link = it['url'] + '#:~:text=' + quote(sec['headline'], safe='')
+        link = (sowhat_sections.issue_url(it['volume'], slug) if sowhat_sections.issue_path(it['volume']).exists()
+                else it['url'] + '#:~:text=' + quote(sec['headline'], safe=''))
         thumb = (f'<img src="{escape(sec["image"],quote=True)}" alt="" width="380" height="217" loading="lazy" decoding="async">' if sec['image']
                  else f'<span class="swa-cat-ph">{escape(label)}</span>')
         items_html.append(
-            f'<li class="swa-cat-row"><a href="{escape(link,quote=True)}" target="_blank" rel="noopener" aria-label="{escape(sec["headline"],quote=True)} — Vol. {it["volume"]} 원문 새 창">'
+            f'<li class="swa-cat-row"><a href="{escape(link,quote=True)}" target="_blank" rel="noopener" aria-label="{escape(sec["headline"],quote=True)} — Vol. {it["volume"]} 쏘왓레터 본문 새 창">'
             f'<span class="swa-cat-when"><b>{it["date"][5:].replace("-",".")}</b><span>Vol. {it["volume"]}</span></span>'
             f'<span class="swa-cat-body"><strong class="swa-cat-h">{escape(sec["headline"])}</strong><span class="swa-cat-x">{escape(sec["excerpt"])}</span></span>'
             f'<span class="swa-cat-thumb">{thumb}</span></a></li>')
