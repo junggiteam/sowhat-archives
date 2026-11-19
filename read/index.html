@@ -6,8 +6,9 @@
 <title>쏘왓레터 읽기 | 중기이코노미 쏘왓레터</title>
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <style>
-html,body{margin:0;height:100%;background:#fff;font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;-webkit-font-smoothing:antialiased}
-.sr-frame{position:fixed;left:0;right:0;top:0;bottom:calc(56px + env(safe-area-inset-bottom));width:100%;height:calc(100% - 56px - env(safe-area-inset-bottom));border:0;display:block;background:#fff}
+html,body{margin:0;height:100%;overflow:hidden;background:#fff;font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;-webkit-font-smoothing:antialiased}
+/* The frame runs under the bar (plus 24px below the screen) so the newsletter's own bottom padding hides behind it. */
+.sr-frame{position:fixed;left:0;right:0;top:0;width:100%;height:calc(100% + 24px);border:0;display:block;background:#fff}
 .sr-bar{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;box-sizing:border-box;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:#d12f30;color:#fff;font-size:17px;font-weight:800;letter-spacing:-.03em;text-decoration:none;box-shadow:0 -4px 16px rgba(25,32,48,.12)}
 .sr-bar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .sr-bar:focus-visible{outline:3px solid #fff;outline-offset:-6px}

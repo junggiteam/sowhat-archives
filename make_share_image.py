@@ -29,42 +29,35 @@ def main():
     canvas = Image.new('RGB', (W * s, H * s), '#ffffff')
     draw = ImageDraw.Draw(canvas)
 
-    # Soft decorative question mark on the right.
-    draw.text((865 * s, 20 * s), '?', font=font(560 * s, 900), fill='#f5f6f8')
-    # Red accent bar on the left edge.
-    draw.rectangle((0, 0, 14 * s, H * s), fill=RED)
+    # Red accent bar along the top edge.
+    draw.rectangle((0, 0, W * s, 14 * s), fill=RED)
 
-    x = 96
-    eyebrow = font(22 * s, 600)
-    cx = x * s
-    for ch in 'SOWHAT LETTER':
-        draw.text((cx, 92 * s), ch, font=eyebrow, fill='#8a9099')
-        cx += draw.textlength(ch, font=eyebrow) + 7 * s
+    # Decorative question mark on the right, kept fully inside the frame
+    # (messengers crop previews slightly at the top and bottom).
+    qfont = font(470 * s, 900)
+    box = draw.textbbox((0, 0), '?', font=qfont)
+    qh = box[3] - box[1]
+    qx = (W - 70) * s - (box[2] - box[0]) - box[0]
+    qy = (H * s - qh) // 2 - box[1] - 42 * s
+    draw.text((qx, qy), '?', font=qfont, fill='#eff1f4')
 
-    head = font(86 * s, 800)
-    draw.text((x * s, 140 * s), '결론이 있는 뉴스레터', font=head, fill=INK)
+    # Three lines, vertically centred as one block.
+    x = 92
+    head = font(104 * s, 800)
+    sub = font(40 * s, 500)
+    line_gap, sub_gap = 18, 44
+    hb = draw.textbbox((0, 0), '결론이 있는 뉴스레터', font=head)
+    sb = draw.textbbox((0, 0), '복잡한 정보는 덜어내고', font=sub)
+    head_h, sub_h = hb[3] - hb[1], sb[3] - sb[1]
+    block = head_h * 2 + line_gap * s + sub_gap * s + sub_h
+    top = (H * s - block) // 2 + 6 * s
+    draw.text((x * s, top - hb[1]), '결론이 있는 뉴스레터', font=head, fill=INK)
+    y2 = top + head_h + line_gap * s
     first = '중기이코노미 '
-    draw.text((x * s, 252 * s), first, font=head, fill=INK)
-    draw.text((x * s + draw.textlength(first, font=head), 252 * s), '쏘왓레터', font=head, fill=RED)
-
-    sub = font(30 * s, 500)
-    draw.text((x * s, 392 * s), '복잡한 정보는 덜어내고, 방향성 있는 결론만', font=sub, fill=GREY)
-
-    draw.line((x * s, 486 * s, (W - x) * s, 486 * s), fill='#e5e7eb', width=2 * s)
-
-    # Publisher wordmarks, matched by width like the site footer.
-    lx = x * s
-    for name, height in (('junggi-wordmark.png', 30), ('bestexit-wordmark.png', 24.5)):
-        logo = Image.open(ROOT / 'assets' / name).convert('RGBA')
-        h = int(height * s)
-        w = int(logo.width * h / logo.height)
-        logo = logo.resize((w, h), Image.LANCZOS)
-        canvas.paste(logo, (lx, int((540 - height / 2) * s)), logo)
-        lx += w + 34 * s
-
-    url = font(26 * s, 700)
-    text = 'sowhat.bestexit.co.kr'
-    draw.text(((W - x) * s - draw.textlength(text, font=url), 522 * s), text, font=url, fill=RED)
+    draw.text((x * s, y2 - hb[1]), first, font=head, fill=INK)
+    draw.text((x * s + draw.textlength(first, font=head), y2 - hb[1]), '쏘왓레터', font=head, fill=RED)
+    y3 = y2 + head_h + sub_gap * s
+    draw.text((x * s, y3 - sb[1]), '복잡한 정보는 덜어내고, 방향성 있는 결론만', font=sub, fill=GREY)
 
     out = canvas.resize((W, H), Image.LANCZOS)
     target = ROOT / 'assets/sowhat-og.png'
