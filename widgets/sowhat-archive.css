@@ -7,28 +7,43 @@
 #sowhat-archive a:focus-visible,#sowhat-archive button:focus-visible,#sowhat-archive input:focus-visible,#sowhat-archive select:focus-visible{outline:2px solid #d12f30;outline-offset:3px}
 #sowhat-archive [hidden]{display:none!important}
 #sowhat-archive .swa-wrap{max-width:1440px;margin:0 auto;padding:0 28px}
-#sowhat-archive .swa-top{min-height:88px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;padding:18px 0}
+#sowhat-archive .swa-top{min-height:88px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 24px;padding:18px 0}
+#sowhat-archive .swa-today{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;font-size:15px;font-weight:600;color:#3d424b;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+#sowhat-archive .swa-weather{position:relative;display:block;width:200px;height:28px;padding-left:14px;border-left:1px solid #e0e3e8;overflow:hidden;white-space:nowrap}
+#sowhat-archive .swa-weather-item{position:absolute;right:0;top:0;height:28px;display:inline-flex;align-items:center;gap:7px;transition:transform .45s ease,opacity .45s ease}
+#sowhat-archive .swa-weather-item.swa-entering{transform:translateY(100%);opacity:0;animation:swa-roll-in .45s ease forwards}
+#sowhat-archive .swa-weather-item.swa-leaving{transform:translateY(-100%);opacity:0}
+@keyframes swa-roll-in{to{transform:translateY(0);opacity:1}}
+#sowhat-archive .swa-weather-icon,#sowhat-archive .swa-weather-icon svg{display:block;width:24px;height:24px}
+#sowhat-archive .swa-temp{display:inline-flex;align-items:center;gap:2px;font-weight:750;color:#1b1d22}
+#sowhat-archive .swa-temp-icon{width:17px;height:17px;fill:none;stroke:#d12f30;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#sowhat-archive .swa-weather-place{font-size:13px;font-weight:600;color:#6b707a}
 #sowhat-archive .swa-brand{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
-#sowhat-archive .swa-brand-context{font-size:18px;line-height:1.5;font-weight:700;letter-spacing:-.05em}
-#sowhat-archive .swa-wordmark{font-size:31px;line-height:1.05;font-weight:850;letter-spacing:-1.3px;color:#d12f30;white-space:nowrap}
+#sowhat-archive .swa-brand-context{font-size:23px;line-height:1.4;font-weight:800;letter-spacing:-.05em;color:#1b1d22}
 #sowhat-archive .swa-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:36px;padding-top:40px;padding-bottom:48px;align-items:start}
 #sowhat-archive .swa-rail{min-width:0}
-#sowhat-archive .swa-eyebrow{font-size:12px;letter-spacing:.12em;font-weight:650;color:#6b707a;margin-bottom:15px}
-#sowhat-archive h1{font-size:45px;font-weight:800;line-height:1.18;letter-spacing:-2px}
+#sowhat-archive .swa-eyebrow{font-size:13px;letter-spacing:.32em;font-weight:600;color:#8a9099;margin-bottom:14px}
+#sowhat-archive h1{font-size:70px;font-weight:800;line-height:1.12;letter-spacing:-3.5px}
 #sowhat-archive h1>span{display:block}
 #sowhat-archive .swa-title-letter{color:#d12f30}
 #sowhat-archive .swa-title-archive{color:#15171b}
-#sowhat-archive .swa-intro-copy{font-size:15px;line-height:1.85;letter-spacing:-.025em;color:#646974;margin-top:20px}
+#sowhat-archive .swa-intro-copy{font-size:15px;line-height:1.7;letter-spacing:-.03em;color:#2b2f36;margin-top:22px;word-break:keep-all;overflow-wrap:anywhere}
+#sowhat-archive .swa-feedback{display:flex;justify-content:center;width:300px;max-width:100%;align-items:center;gap:8px;margin-top:16px;min-height:46px;padding:10px 20px;border:1px solid #e3e6ea;border-radius:999px;background:#fff;box-shadow:0 3px 12px rgba(25,32,48,.06);font-size:15px;font-weight:700;letter-spacing:-.03em;color:#2b2f36;transition:border-color .2s ease,box-shadow .2s ease}
+#sowhat-archive .swa-feedback:hover{border-color:#d6d9df;box-shadow:0 5px 16px rgba(25,32,48,.09)}
+#sowhat-archive .swa-feedback span{font-size:18px;line-height:1}
 #sowhat-archive .swa-rail-rule{border:0;border-top:1px solid #e5e7eb;margin:26px 0}
-#sowhat-archive .swa-month-nav{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:12px;padding:16px 10px 10px}
-#sowhat-archive .swa-rail-title{font-size:16px;font-weight:750;letter-spacing:-.035em;color:#30343c;margin:0 6px 12px}
-#sowhat-archive [data-swa-months]{max-height:304px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#cdd1d8 transparent;padding:2px}
-#sowhat-archive .swa-month-link{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:1px solid transparent;border-radius:8px;min-height:44px;padding:9px 12px;font-size:15px;font-weight:550;color:#555b65;text-align:left;white-space:nowrap}
+#sowhat-archive .swa-month-nav{background:#fff;border:1px solid #e3e6ea;border-radius:14px;box-shadow:0 4px 18px rgba(25,32,48,.05);overflow:hidden}
+#sowhat-archive .swa-rail-title{display:flex;align-items:center;gap:8px;padding:15px 16px;border-bottom:1px solid #eef0f3;font-size:16px;font-weight:800;letter-spacing:-.03em;color:#1b1d22}
+#sowhat-archive .swa-rail-title .swa-cal{width:18px;height:18px;color:#d12f30}
+#sowhat-archive .swa-cal{display:block;flex:none;width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#sowhat-archive [data-swa-months]{max-height:330px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#cdd1d8 transparent;padding:8px}
+#sowhat-archive .swa-month-link{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:1px solid transparent;border-radius:9px;min-height:44px;padding:9px 12px 9px 14px;font-size:15px;font-weight:600;color:#3d424b;text-align:left;white-space:nowrap;transition:background-color .15s ease,color .15s ease}
+#sowhat-archive .swa-month-link:first-child{border-bottom:1px dashed #e3e6ea;border-radius:9px 9px 0 0;margin-bottom:4px}
 #sowhat-archive .swa-month-link+.swa-month-link{margin-top:3px}
-#sowhat-archive .swa-month-link:hover{background:#fff;border-color:#e2e5ea}
-#sowhat-archive .swa-month-link[aria-current=page]{font-weight:750;color:#fff;background:#d12f30;border-color:#d12f30}
-#sowhat-archive .swa-month-link span{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:1px 7px;border-radius:5px;font-size:13px;line-height:22px;background:#e9ecf0;color:#666c76;font-weight:600}
-#sowhat-archive .swa-month-link[aria-current=page] span{background:rgba(255,255,255,.18);color:#fff}
+#sowhat-archive .swa-month-link:hover{background:#f6f7f9}
+#sowhat-archive .swa-month-link[aria-current=page]{font-weight:800;color:#c62a2b;background:#fdeeee}
+#sowhat-archive .swa-month-link span{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:1px 8px;border-radius:999px;font-size:13px;line-height:22px;background:#f1f3f5;color:#5f6570;font-weight:700;font-variant-numeric:tabular-nums}
+#sowhat-archive .swa-month-link[aria-current=page] span{background:#d12f30;color:#fff}
 #sowhat-archive .swa-form{margin-top:28px;width:300px;max-width:100%;scroll-margin-top:28px;border-radius:10px;background:#fff;overflow:hidden;box-shadow:0 5px 22px rgba(25,32,48,.065),0 1px 4px rgba(25,32,48,.035)}
 #sowhat-archive .swa-form iframe{display:block;width:300px;max-width:100%;height:288px;border:0;background:#fff}
 #sowhat-archive .swa-content{min-width:0}
@@ -37,11 +52,12 @@
 #sowhat-archive .swa-count{font-size:14px;font-weight:500;color:#717782;margin-left:8px}
 #sowhat-archive .swa-tools{display:flex;align-items:center;gap:8px;min-width:0}
 #sowhat-archive .swa-tools[aria-hidden=true]{visibility:hidden}
-#sowhat-archive .swa-search{display:flex;align-items:center;gap:8px;border:1px solid #e0e3e8;border-radius:8px;background:#f7f8fa;min-height:43px;padding:0 12px;width:208px;min-width:0;margin:0}
-#sowhat-archive .swa-search-mark{font-size:24px;line-height:1;color:#6c727c}
-#sowhat-archive .swa-search input{display:block;min-width:0;width:100%;border:0;border-radius:0;background:transparent;outline:0;min-height:41px;font-size:14px;color:#30343c;padding:0}
+#sowhat-archive .swa-search{display:flex;align-items:center;gap:9px;border:1px solid #e0e3e8;border-radius:8px;background:#f7f8fa;height:44px;padding:0 14px;width:280px;min-width:0;margin:0}
+#sowhat-archive .swa-search-mark{display:flex;align-items:center;justify-content:center;flex:none;width:18px;height:18px;color:#6c727c}
+#sowhat-archive .swa-search-mark svg{display:block;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+#sowhat-archive .swa-search:focus-within{border-color:#c9cdd4;background:#fff}
+#sowhat-archive .swa-search input{display:block;min-width:0;width:100%;border:0;border-radius:0;background:transparent;outline:0;height:42px;line-height:42px;font-size:15px;color:#30343c;padding:0;margin:0}
 #sowhat-archive .swa-search input::placeholder{color:#7a808a}
-#sowhat-archive .swa-month{border:1px solid #e0e3e8;border-radius:8px;background:#fff;color:#555c67;min-height:43px;font-size:14px;padding:0 27px 0 11px;max-width:156px}
 #sowhat-archive .swa-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 18px;margin:0;align-items:stretch}
 #sowhat-archive .swa-card{display:block;min-width:0;padding:0;border:1px solid #e5e7eb;border-radius:13px;background:#fff;overflow:hidden;box-shadow:0 3px 13px rgba(25,32,48,.045);transition:border-color .2s ease,box-shadow .2s ease}
 #sowhat-archive .swa-card:hover{border-color:#d6d9df;box-shadow:0 5px 18px rgba(25,32,48,.075)}
@@ -52,25 +68,27 @@
 #sowhat-archive .swa-cover-fallback{font-size:27px;letter-spacing:-1px;font-weight:750;color:#a8adb6;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:-1}
 #sowhat-archive .swa-cover.swa-no-image .swa-cover-fallback{z-index:0}
 #sowhat-archive .swa-card-body{padding:16px 14px 20px;min-width:0;flex:1}
-#sowhat-archive .swa-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px 12px;font-size:14px;font-weight:550;color:#6c727d;line-height:1.5;font-variant-numeric:tabular-nums}
-#sowhat-archive .swa-volume{font-size:15px;font-weight:750;color:#424853;white-space:nowrap}
-#sowhat-archive .swa-meta time{white-space:nowrap}
-#sowhat-archive .swa-card h2{font-size:21px;font-weight:700;letter-spacing:-.035em;line-height:1.48;margin-top:10px;color:#1b1d22;word-break:normal;overflow-wrap:anywhere;text-align:left}
+#sowhat-archive .swa-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px 12px;padding-bottom:13px;border-bottom:1px solid #e9ebef;font-size:14px;font-weight:550;color:#6c727d;line-height:1.5;font-variant-numeric:tabular-nums}
+#sowhat-archive .swa-volume{display:inline-flex;align-items:center;height:28px;padding:0 11px;border-radius:999px;background:#fdeeee;color:#c62a2b;font-size:14.5px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;transition:background-color .2s ease,color .2s ease}
+#sowhat-archive .swa-meta time{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:#5f6570;font-weight:600}
+#sowhat-archive .swa-meta time .swa-cal{transition:color .2s ease}
+#sowhat-archive .swa-card:hover .swa-volume{background:#d12f30;color:#fff}
+#sowhat-archive .swa-card:hover .swa-meta time .swa-cal{color:#d12f30}
+#sowhat-archive .swa-card h2{font-size:18px;font-weight:650;letter-spacing:-.035em;line-height:1.5;margin-top:13px;color:#1b1d22;word-break:normal;overflow-wrap:anywhere;text-align:left;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;min-height:3em}
 #sowhat-archive .swa-empty{padding:50px 0;text-align:center;color:#6c727d;font-size:16px}
 #sowhat-archive .swa-bottom{text-align:center;margin:36px 0 0}
-#sowhat-archive .swa-more{min-width:210px;min-height:46px;border:1px solid #dce0e6;border-radius:8px;background:#fff;color:#545b66;font-size:15px;font-weight:600;padding:11px 25px}
-#sowhat-archive .swa-more:hover{background:#f7f8fa}
-#sowhat-archive .swa-shown{font-size:13px;color:#777e89;margin-top:13px}
+#sowhat-archive .swa-more{min-width:210px;min-height:46px;border:1px solid #dce0e6;border-radius:8px;background:#fff;color:#454b55;font-size:15px;font-weight:650;padding:11px 25px;transition:color .2s ease}
+#sowhat-archive .swa-more:hover{color:#d12f30}
 #sowhat-archive .swa-footer{border-top:1px solid #e5e7eb;padding:27px 0;display:flex;justify-content:space-between;align-items:center;gap:24px;font-size:13px;color:#777e89}
 #sowhat-archive .swa-footer-copy{display:grid;gap:5px}
 #sowhat-archive .swa-footer strong{font-size:14px;font-weight:700;color:#555c67}
-#sowhat-archive .swa-footer-logos{display:flex;align-items:center;justify-content:flex-end;gap:25px;flex:none}
+#sowhat-archive .swa-footer-logos{display:flex;align-items:center;justify-content:flex-end;gap:28px;flex:none}
 #sowhat-archive .swa-footer-logos a{display:flex;align-items:center;min-height:44px}
-#sowhat-archive .swa-footer-logos img{display:block;height:auto;max-height:44px;object-fit:contain}
-#sowhat-archive .swa-logo-junggi{width:118px}
-#sowhat-archive .swa-logo-bestexit{width:146px}
+#sowhat-archive .swa-footer-logos img{display:block;width:auto}
+#sowhat-archive .swa-logo-junggi{height:19px}
+#sowhat-archive .swa-logo-bestexit{height:15.5px}
 @media(max-width:1180px){#sowhat-archive .swa-layout{gap:28px}#sowhat-archive .swa-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#sowhat-archive .swa-toolbar{flex-wrap:wrap;gap:14px}#sowhat-archive .swa-tools{width:100%}#sowhat-archive .swa-search{flex:1;width:auto}}
-@media(max-width:820px){#sowhat-archive .swa-wrap{padding:0 22px}#sowhat-archive .swa-top{min-height:78px}#sowhat-archive .swa-layout{display:flex;flex-direction:column;gap:27px;padding-top:28px;padding-bottom:36px}#sowhat-archive .swa-rail{display:contents}#sowhat-archive .swa-intro{order:1;width:100%}#sowhat-archive .swa-content{order:2;width:100%}#sowhat-archive .swa-form{order:3;margin:10px auto 0}#sowhat-archive h1{font-size:38px;letter-spacing:-1.5px}#sowhat-archive .swa-intro-copy{font-size:15px;margin-top:16px;max-width:540px}#sowhat-archive .swa-rail-rule{margin:23px 0}#sowhat-archive .swa-month-nav{padding:14px 12px 12px}#sowhat-archive .swa-rail-title{margin:0 0 10px}#sowhat-archive [data-swa-months]{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:2px 2px 7px}#sowhat-archive .swa-month-link{width:auto;flex:none;min-height:42px;border-color:#e2e5ea;background:#fff;font-size:14px;padding:8px 11px;gap:10px}#sowhat-archive .swa-month-link+.swa-month-link{margin-top:0}#sowhat-archive .swa-toolbar{min-height:0;padding-bottom:17px}#sowhat-archive .swa-footer{flex-wrap:wrap;gap:20px}#sowhat-archive .swa-footer-logos{margin-left:auto}}
-@media(max-width:550px){#sowhat-archive .swa-wrap{padding:0 20px}#sowhat-archive .swa-brand{gap:7px 13px}#sowhat-archive .swa-brand-context{font-size:15px}#sowhat-archive .swa-wordmark{font-size:27px}#sowhat-archive .swa-top{min-height:72px}#sowhat-archive .swa-grid{grid-template-columns:1fr;gap:22px}#sowhat-archive .swa-tools{gap:7px}#sowhat-archive .swa-search input{font-size:16px}#sowhat-archive .swa-month{font-size:14px;max-width:145px;min-height:44px}#sowhat-archive .swa-search{min-height:44px}#sowhat-archive .swa-card h2{font-size:21px;line-height:1.5}#sowhat-archive .swa-meta{font-size:14px}#sowhat-archive .swa-volume{font-size:15px}#sowhat-archive .swa-footer{flex-direction:column;align-items:flex-start}#sowhat-archive .swa-footer-logos{margin:0;gap:22px}#sowhat-archive .swa-logo-junggi{width:108px}#sowhat-archive .swa-logo-bestexit{width:136px}}
-@media(max-width:340px){#sowhat-archive .swa-wrap{padding:0 14px}#sowhat-archive .swa-wordmark{font-size:24px}#sowhat-archive .swa-brand-context{font-size:14px}#sowhat-archive .swa-tools{flex-wrap:wrap}#sowhat-archive .swa-search{flex-basis:100%}}
+@media(max-width:820px){#sowhat-archive .swa-wrap{padding:0 22px}#sowhat-archive .swa-top{min-height:78px}#sowhat-archive .swa-layout{display:flex;flex-direction:column;gap:27px;padding-top:28px;padding-bottom:36px}#sowhat-archive .swa-rail{display:contents}#sowhat-archive .swa-intro{order:1;width:100%}#sowhat-archive .swa-content{order:2;width:100%}#sowhat-archive .swa-form{order:3;margin:10px auto 0}#sowhat-archive h1{font-size:56px;letter-spacing:-2.5px}#sowhat-archive .swa-feedback{order:4;margin:4px auto 0}#sowhat-archive .swa-intro-copy{font-size:15px;margin-top:16px;max-width:540px}#sowhat-archive .swa-rail-rule{margin:23px 0}#sowhat-archive .swa-rail-title{padding:13px 14px}#sowhat-archive [data-swa-months]{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:12px 12px 14px}#sowhat-archive .swa-month-link,#sowhat-archive .swa-month-link:first-child{width:auto;flex:none;min-height:42px;border:1px solid #e2e5ea;border-radius:999px;margin:0;background:#fff;font-size:14px;padding:8px 8px 8px 14px;gap:10px}#sowhat-archive .swa-month-link[aria-current=page]{border-color:#f5cccc;background:#fdeeee}#sowhat-archive .swa-month-link+.swa-month-link{margin-top:0}#sowhat-archive .swa-toolbar{min-height:0;padding-bottom:17px}#sowhat-archive .swa-footer{flex-wrap:wrap;gap:20px}#sowhat-archive .swa-footer-logos{margin-left:auto}}
+@media(max-width:550px){#sowhat-archive .swa-wrap{padding:0 20px}#sowhat-archive .swa-brand{gap:7px 13px}#sowhat-archive .swa-brand-context{font-size:20px}#sowhat-archive .swa-top{min-height:72px}#sowhat-archive .swa-grid{grid-template-columns:1fr;gap:22px}#sowhat-archive .swa-search input{font-size:16px}#sowhat-archive .swa-card h2{font-size:18px}#sowhat-archive .swa-meta{font-size:14px}#sowhat-archive .swa-volume{font-size:15px}#sowhat-archive .swa-footer{flex-direction:column;align-items:flex-start}#sowhat-archive .swa-footer-logos{margin:0;gap:22px}#sowhat-archive .swa-logo-junggi{height:18px}#sowhat-archive .swa-logo-bestexit{height:14.5px}#sowhat-archive .swa-today{width:100%;justify-content:flex-start;font-size:14px;gap:6px 12px}#sowhat-archive .swa-weather{width:192px;padding-left:12px}#sowhat-archive .swa-weather-item{left:12px;right:auto}#sowhat-archive .swa-year{display:none}#sowhat-archive .swa-today{flex-wrap:nowrap}}
+@media(max-width:340px){#sowhat-archive .swa-wrap{padding:0 14px}#sowhat-archive .swa-brand-context{font-size:18px}#sowhat-archive .swa-tools{flex-wrap:wrap}#sowhat-archive .swa-search{flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){#sowhat-archive .swa-cover img,#sowhat-archive .swa-card{transition:none}#sowhat-archive .swa-card a:hover img{transform:none}}

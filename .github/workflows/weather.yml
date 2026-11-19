@@ -1,0 +1,39 @@
+name: Update Seoul weather
+
+# Publishes KMA (기상청) current weather for the archive header to the separate
+# `weather` branch, so hourly updates never trigger a Pages build on main.
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sowhat-weather
+  cancel-in-progress: true
+
+jobs:
+  weather:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch KMA ultra-short-term weather
+        env:
+          KMA_SERVICE_KEY: ${{ secrets.KMA_SERVICE_KEY }}
+        run: python fetch_weather.py --out "$RUNNER_TEMP/weather.json"
+      - name: Publish to the weather branch
+        # A single replaced commit keeps this data-only branch from growing.
+        run: |
+          git config user.name "junggiteam"
+          git config user.email "junggiteam@gmail.com"
+          git switch --orphan weather
+          cp "$RUNNER_TEMP/weather.json" weather.json
+          git add weather.json
+          git commit --quiet -m "Weather update"
+          git push --force origin weather

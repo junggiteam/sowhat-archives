@@ -13,6 +13,8 @@
 - 공유 이미지: `assets/sowhat-share.png` (1200×630). 원본 생성 코드는 `make_share_image.py`이며 로컬 Windows/Pillow로 렌더링합니다. 자동 갱신에는 Pillow가 필요 없습니다.
 - 네이버 소유 확인용 공개 메타 태그는 `site-verification.json`에서 읽어 매번 생성합니다. 이 값은 공개 HTML에 게시하는 소유 확인 값이며 로그인 비밀키가 아닙니다.
 
+- 상단 날짜·날씨: 날짜는 브라우저가 한국시간으로 표시합니다. 날씨는 GitHub Actions `Update Seoul weather`(`.github/workflows/weather.yml`, 매시 7분·37분)가 기상청 단기예보 조회서비스(초단기실황·초단기예보)에서 서울·인천·대전·광주·대구·울산·부산·제주를 받아 별도 `weather` 브랜치의 `weather.json`에 저장하고, 화면은 4초마다 도시를 넘겨 보여 줍니다. 공공데이터포털 인증키는 repository secret `KMA_SERVICE_KEY`에서만 읽으며 공개 파일에 넣지 않습니다. `weather` 브랜치는 한 개 커밋으로 덮어쓰므로 main 배포를 일으키지 않습니다. 기상청 자료가 3시간 넘게 갱신되지 않으면 키가 필요 없는 Open-Meteo로 대신 표시합니다.
+
 로컬 빌드: `python build_site.py`
 
 공개 데이터 갱신 후 빌드: `python build_site.py --refresh`
