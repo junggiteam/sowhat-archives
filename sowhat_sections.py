@@ -104,7 +104,9 @@ def write_issue_page(item: dict, document: str) -> None:
             'text-decoration:none!important;box-shadow:0 -4px 16px rgba(25,32,48,.12)}'
             '.swa-issue-bar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}'
             # like the volume reader: the newsletter's own bottom padding runs under the bar
-            'body{padding-bottom:0!important}.stb-container-full{padding-bottom:64px!important}</style>'
+            '@media(max-width:820px){body{padding-bottom:0!important}.stb-container-full{padding-bottom:64px!important}}'
+            # PC: no bar (mobile only, like the volume reader)
+            '@media(min-width:821px){.swa-issue-bar{display:none!important}}</style>'
             f'<a class="swa-issue-bar" href="{SITE}" data-swa-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>쏘왓레터 모아보기로 가기</span></a>'
             '<script>(function(){var L=' + json.dumps(labels, ensure_ascii=False) + ',S="' + SITE + '";'
             'var m=/(?:^|&)c=([a-z]+)/.exec(location.hash.slice(1));var label=m&&L[m[1]];if(!label)return;'
