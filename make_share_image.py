@@ -60,7 +60,7 @@ def main():
     draw.text((x * s, y3 - sb[1]), '복잡한 정보는 덜어내고, 방향성 있는 결론만', font=sub, fill=GREY)
 
     out = canvas.resize((W, H), Image.LANCZOS)
-    target = ROOT / 'assets/sowhat-og.png'
+    target = ROOT / 'assets/sowhat-og-v2.png'  # new name per design change so messengers refetch
     out.save(target, optimize=True)
     print(target, out.size)
 
