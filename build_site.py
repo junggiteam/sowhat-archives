@@ -64,7 +64,10 @@ def render_page(payload: dict, archive_month: str = '') -> str:
             {'@type':'ListItem','position':2,'name':month_name(archive_month),'item':canonical},
         ]})
     structured = json.dumps({'@context':'https://schema.org','@graph':graph},ensure_ascii=False).replace('<','\\u003c')
-    image = CANONICAL+'assets/sowhat-share.png'
+    image = CANONICAL+'assets/sowhat-og.png'
+    # Link previews (KakaoTalk, SNS) use brand copy on the main page; search title/description stay keyword-focused.
+    share_title = title if archive_month else '결론이 있는 뉴스레터, 중기이코노미 쏘왓레터'
+    share_description = description if archive_month else '복잡한 정보는 덜어내고 방향성 있는 결론만 전달하는 쏘왓레터를 구독해보세요'
     head = f'''<!doctype html>
 <html lang="ko"><head>
 <meta charset="utf-8">
@@ -80,16 +83,16 @@ def render_page(payload: dict, archive_month: str = '') -> str:
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="중기이코노미 쏘왓레터">
-<meta property="og:title" content="{escape(title,quote=True)}">
-<meta property="og:description" content="{escape(description,quote=True)}">
+<meta property="og:title" content="{escape(share_title,quote=True)}">
+<meta property="og:description" content="{escape(share_description,quote=True)}">
 <meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{image}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="중기이코노미 경제뉴스레터·경영뉴스레터 쏘왓레터 모아보기">
+<meta property="og:image:alt" content="결론이 있는 뉴스레터, 중기이코노미 쏘왓레터">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{escape(title,quote=True)}">
-<meta name="twitter:description" content="{escape(description,quote=True)}">
+<meta name="twitter:title" content="{escape(share_title,quote=True)}">
+<meta name="twitter:description" content="{escape(share_description,quote=True)}">
 <meta name="twitter:image" content="{image}">
 <meta name="theme-color" content="#d12f30">
 <script type="application/ld+json">{structured}</script>
@@ -122,6 +125,9 @@ def main() -> None:
         destination = ROOT / (key.replace('-','/') if key else '') / 'index.html'
         destination.parent.mkdir(parents=True,exist_ok=True)
         destination.write_text(render_page(data,key),encoding='utf-8')
+    reader = ROOT / 'read' / 'index.html'
+    reader.parent.mkdir(exist_ok=True)
+    reader.write_text((ROOT / 'widgets/sowhat-reader.html').read_text(encoding='utf-8'),encoding='utf-8')
     (ROOT / 'CNAME').write_text('sowhat.bestexit.co.kr\n',encoding='utf-8')
     (ROOT / '.nojekyll').write_text('',encoding='utf-8')
     (ROOT / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /widgets/\nSitemap: '+CANONICAL+'sitemap.xml\n',encoding='utf-8')

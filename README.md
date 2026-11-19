@@ -10,7 +10,7 @@
 - 구독은 기존 스티비 구독폼에서 처리합니다. 이 저장소에는 신청자의 개인정보를 저장하지 않습니다.
 - SEO: 월별 정적 페이지(`/2026/11/` 등), 월별 고유 제목·설명·canonical, 발행호 ItemList와 WebSite/Breadcrumb 구조화 데이터, 전체 월별 링크 및 자동 사이트맵을 생성합니다.
 - 새 달의 발행호가 추가되면 월별 페이지와 사이트맵도 같은 자동 갱신 작업에서 생성됩니다. 검색엔진의 수집·색인 시점은 검색엔진이 결정합니다.
-- 공유 이미지: `assets/sowhat-share.png` (1200×630). 원본 생성 코드는 `make_share_image.py`이며 로컬 Windows/Pillow로 렌더링합니다. 자동 갱신에는 Pillow가 필요 없습니다.
+- 공유 이미지: `assets/sowhat-og.png` (1200×630). 원본 생성 코드는 `make_share_image.py`이며 로컬 Windows(Noto Sans KR)/Pillow로 렌더링합니다. 대표 페이지의 공유 제목·설명은 브랜드 문구, 검색 제목·설명은 키워드 중심으로 따로 둡니다. 자동 갱신에는 Pillow가 필요 없습니다.
 - 네이버 소유 확인용 공개 메타 태그는 `site-verification.json`에서 읽어 매번 생성합니다. 이 값은 공개 HTML에 게시하는 소유 확인 값이며 로그인 비밀키가 아닙니다.
 
 - 상단 날짜·날씨: 날짜는 브라우저가 한국시간으로 표시합니다. 날씨는 GitHub Actions `Update Seoul weather`(`.github/workflows/weather.yml`, 매시 7분·37분)가 기상청 단기예보 조회서비스(초단기실황·초단기예보)에서 서울·인천·대전·광주·대구·울산·부산·제주를 받아 별도 `weather` 브랜치의 `weather.json`에 저장하고, 화면은 4초마다 도시를 넘겨 보여 줍니다. 공공데이터포털 인증키는 repository secret `KMA_SERVICE_KEY`에서만 읽으며 공개 파일에 넣지 않습니다. `weather` 브랜치는 한 개 커밋으로 덮어쓰므로 main 배포를 일으키지 않습니다. 기상청 자료가 3시간 넘게 갱신되지 않으면 키가 필요 없는 Open-Meteo로 대신 표시합니다.

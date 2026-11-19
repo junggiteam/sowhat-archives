@@ -284,6 +284,36 @@
     document.addEventListener('click', event => { if (monthMenu.open && !monthMenu.contains(event.target)) monthMenu.open = false; });
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && monthMenu.open) { monthMenu.open = false; monthMenu.querySelector('summary').focus(); } });
   }
+  // Mobile: fixed '뉴스레터 구독하기' bar jumps to the subscribe box and hides while the box or footer is on screen.
+  const stickyCta = root.querySelector('[data-swa-sticky-cta]');
+  const subscribe = root.querySelector('#sowhat-subscribe-form');
+  if (stickyCta && subscribe) {
+    stickyCta.addEventListener('click', event => {
+      event.preventDefault();
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      subscribe.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    });
+    if ('IntersectionObserver' in window) {
+      const visible = new Set();
+      const watch = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if (entry.isIntersecting) visible.add(entry.target); else visible.delete(entry.target); });
+        stickyCta.classList.toggle('is-hidden', visible.size > 0);
+      }, { threshold: 0.15 });
+      watch.observe(subscribe);
+      const footer = root.querySelector('.swa-footer');
+      if (footer) watch.observe(footer);
+    }
+  }
+  const mobileReader = window.matchMedia ? window.matchMedia('(max-width: 820px)') : null;
+  grid.addEventListener('click', event => {
+    if (!mobileReader || !mobileReader.matches || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest('a[href]');
+    const match = link && /^https:\/\/stib\.ee\/([A-Za-z0-9_-]+)$/.exec(link.href);
+    if (!match) return;
+    event.preventDefault();
+    const sameSite = location.hostname === new URL(archiveBase).hostname || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    location.assign((sameSite ? '/' : archiveBase) + 'read/?id=' + encodeURIComponent(match[1]));
+  });
   rebuildMonths();
   render();
   currentSignature = JSON.stringify(allItems);

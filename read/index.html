@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,follow">
+<title>쏘왓레터 읽기 | 중기이코노미 쏘왓레터</title>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<style>
+html,body{margin:0;height:100%;background:#fff;font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;-webkit-font-smoothing:antialiased}
+.sr-frame{position:fixed;left:0;right:0;top:0;bottom:calc(56px + env(safe-area-inset-bottom));width:100%;height:calc(100% - 56px - env(safe-area-inset-bottom));border:0;display:block;background:#fff}
+.sr-bar{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;box-sizing:border-box;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:#d12f30;color:#fff;font-size:17px;font-weight:800;letter-spacing:-.03em;text-decoration:none;box-shadow:0 -4px 16px rgba(25,32,48,.12)}
+.sr-bar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.sr-bar:focus-visible{outline:3px solid #fff;outline-offset:-6px}
+.sr-missing{position:fixed;inset:0 0 56px;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:#555b65;font-size:16px;line-height:1.6}
+.sr-missing[hidden]{display:none}
+</style>
+</head><body>
+<iframe class="sr-frame" title="쏘왓레터 원문" referrerpolicy="no-referrer-when-downgrade" hidden></iframe>
+<p class="sr-missing" hidden>뉴스레터를 찾지 못했어요.<br>아래 버튼으로 모아보기에서 다시 골라 주세요.</p>
+<a class="sr-bar" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>쏘왓레터 모아보기로 가기</a>
+<script>
+(function () {
+  'use strict';
+  var id = new URLSearchParams(location.search).get('id') || '';
+  var frame = document.querySelector('.sr-frame');
+  var bar = document.querySelector('.sr-bar');
+  if (/^[A-Za-z0-9_-]{2,40}$/.test(id)) {
+    frame.src = 'https://stib.ee/' + id;
+    frame.hidden = false;
+  } else {
+    document.querySelector('.sr-missing').hidden = false;
+  }
+  // Return to the archive page the reader came from (keeps its scroll position); otherwise the main archive.
+  var ref = '';
+  try { ref = new URL(document.referrer).origin === location.origin ? document.referrer : ''; } catch (_) {}
+  if (ref && !/\/read\//.test(ref)) bar.href = ref;
+  bar.addEventListener('click', function (event) {
+    if (ref && history.length > 1) { event.preventDefault(); history.back(); }
+  });
+})();
+</script>
+</body></html>
