@@ -326,6 +326,19 @@
     const sameSite = location.hostname === new URL(archiveBase).hostname || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
     location.assign((sameSite ? '/' : archiveBase) + 'read/?id=' + encodeURIComponent(match[1]));
   });
+  // PC: TOP button appears after scrolling down and returns smoothly to the top.
+  const toTop = root.querySelector('[data-swa-totop]');
+  if (toTop) {
+    toTop.hidden = false;
+    const updateTop = () => toTop.classList.toggle('is-visible', window.scrollY > 400);
+    window.addEventListener('scroll', updateTop, { passive: true });
+    updateTop();
+    toTop.addEventListener('click', event => {
+      event.preventDefault();
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
   rebuildMonths();
   render();
   currentSignature = JSON.stringify(allItems);
