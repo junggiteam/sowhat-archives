@@ -326,6 +326,30 @@
     const sameSite = location.hostname === new URL(archiveBase).hostname || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
     location.assign((sameSite ? '/' : archiveBase) + 'read/?id=' + encodeURIComponent(match[1]));
   });
+  // Mobile: scale the embedded subscribe form (built for 300px) up to the available width.
+  const subscribeFrame = subscribe && subscribe.querySelector('iframe');
+  if (subscribe && subscribeFrame) {
+    const fitSubscribe = () => {
+      const mobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+      const layout = subscribe.closest('.swa-layout');
+      const pad = layout ? getComputedStyle(layout) : null;
+      const avail = layout ? layout.clientWidth - parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight) : 300;
+      const k = mobile ? Math.max(0.85, Math.min(avail / 300, 1.3)) : 1;
+      if (k === 1) {
+        subscribe.style.width = subscribe.style.height = '';
+        subscribeFrame.style.transform = subscribeFrame.style.transformOrigin = '';
+        subscribeFrame.style.margin = '-5px 0 0 -1px';
+        return;
+      }
+      subscribe.style.width = (300 * k) + 'px';
+      subscribe.style.height = (277 * k) + 'px';
+      subscribeFrame.style.transformOrigin = '0 0';
+      subscribeFrame.style.transform = 'scale(' + k + ')';
+      subscribeFrame.style.margin = (-5 * k) + 'px 0 0 ' + (-1 * k) + 'px';
+    };
+    fitSubscribe();
+    window.addEventListener('resize', fitSubscribe, { passive: true });
+  }
   // PC: TOP button appears after scrolling down and returns smoothly to the top.
   const toTop = root.querySelector('[data-swa-totop]');
   if (toTop) {
