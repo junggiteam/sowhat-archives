@@ -4,9 +4,6 @@ name: Refresh So What archive site
 # (16:10 16:30 16:50 17:10 17:40 18:10, and 09:10 to catch up). GitHub cron was
 # unreliable (runs hours apart), so there is no schedule here.
 on:
-  # Temporary backup until the sowhat-cron GitHub key is installed; then removed.
-  schedule:
-    - cron: '19,49 * * * *'
   workflow_dispatch:
 
 permissions:
