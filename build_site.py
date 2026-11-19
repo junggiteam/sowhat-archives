@@ -64,7 +64,7 @@ def render_page(payload: dict, archive_month: str = '') -> str:
             {'@type':'ListItem','position':2,'name':month_name(archive_month),'item':canonical},
         ]})
     structured = json.dumps({'@context':'https://schema.org','@graph':graph},ensure_ascii=False).replace('<','\\u003c')
-    image = CANONICAL+'assets/sowhat-og-v3.png'
+    image = CANONICAL+'assets/sowhat-og-v4.png'
     # Link previews (KakaoTalk, SNS) use brand copy on the main page; search title/description stay keyword-focused.
     share_title = title if archive_month else '결론이 있는 뉴스레터, 중기이코노미 쏘왓레터'
     share_description = description if archive_month else '복잡한 정보는 덜어내고 방향성 있는 결론만 전달하는 쏘왓레터를 구독해보세요'

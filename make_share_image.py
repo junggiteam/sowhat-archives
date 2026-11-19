@@ -1,4 +1,4 @@
-"""Render the link-preview (Open Graph) card: assets/sowhat-og-v3.png, 1200x630.
+"""Render the link-preview (Open Graph) card: assets/sowhat-og-v4.png, 1200x630.
 
 Photo background (assets/src/og-photo.webp) lightly darkened, centred three-line
 copy with a soft shadow. Run locally with Pillow; uses the Noto Sans KR variable
@@ -49,17 +49,17 @@ def radial(size, inner_alpha, outer_alpha):
     return layer
 
 
-def main():
+def main(head_size=96, sub_size=42, sub_color=(248, 249, 251), sub_gap_px=38, target=None):
     base = photo((W * S, H * S)).convert('RGBA')
     base.alpha_composite(Image.new('RGBA', base.size, (10, 14, 22, 70)))
     base.alpha_composite(radial(base.size, 120, 20))
 
-    head, sub = font(88, 800), font(34, 500)
+    head, sub = font(head_size, 800), font(sub_size, 500)
     d = ImageDraw.Draw(base)
     hb = d.textbbox((0, 0), L1, font=head)
     sb = d.textbbox((0, 0), SUB, font=sub)
     hh, sh = hb[3] - hb[1], sb[3] - sb[1]
-    gap, sub_gap = 18 * S, 40 * S
+    gap, sub_gap = 18 * S, sub_gap_px * S
     top = (H * S - (hh * 2 + gap + sub_gap + sh)) // 2
     cx = W * S // 2
     y2 = top + hh + gap
@@ -78,10 +78,10 @@ def main():
     w2 = d.textlength(L2A + L2B, font=head)
     d.text((cx - w2 / 2, y2 - hb[1]), L2A, font=head, fill=(255, 255, 255))
     d.text((cx - w2 / 2 + d.textlength(L2A, font=head), y2 - hb[1]), L2B, font=head, fill=BRIGHT_RED)
-    d.text((cx - d.textlength(SUB, font=sub) / 2, y3 - sb[1]), SUB, font=sub, fill=(226, 230, 235))
+    d.text((cx - d.textlength(SUB, font=sub) / 2, y3 - sb[1]), SUB, font=sub, fill=sub_color)
 
     out = base.convert('RGB').resize((W, H), Image.LANCZOS)
-    target = ROOT / 'assets/sowhat-og-v3.png'
+    target = target or ROOT / 'assets/sowhat-og-v4.png'
     out.save(target, optimize=True)
     print(target, out.size)
 
