@@ -57,31 +57,34 @@
 #sowhat-archive h1>span{display:block}
 #sowhat-archive .swa-title-letter{color:#d12f30}
 #sowhat-archive .swa-title-archive{color:#15171b}
-#sowhat-archive .swa-intro-copy{font-size:15px;line-height:1.7;letter-spacing:-.03em;color:#2b2f36;margin-top:22px;word-break:keep-all;overflow-wrap:anywhere}
-#sowhat-archive .swa-intro-copy p+p{margin-top:0}
-#sowhat-archive .swa-intro-copy strong{font-weight:800;color:#0e1013}
+#sowhat-archive .swa-intro-copy{font-size:17px;line-height:1.6;letter-spacing:-.045em;color:#3a3f47;margin-top:24px;word-break:keep-all}
+#sowhat-archive .swa-intro-copy p+p{margin-top:14px}
+#sowhat-archive .swa-intro-copy strong{font-weight:800;color:#111316}
+#sowhat-archive .swa-intro-copy .swa-sub{font-size:.72em;font-weight:500;color:#8a9099;letter-spacing:0}
 #sowhat-archive .swa-feedback{display:flex;justify-content:center;width:300px;max-width:100%;align-items:center;gap:8px;margin-top:16px;min-height:46px;padding:10px 20px;border:1px solid #e3e6ea;border-radius:999px;background:#fff;box-shadow:0 3px 12px rgba(25,32,48,.06);font-size:15px;font-weight:700;letter-spacing:-.03em;color:#2b2f36;transition:border-color .2s ease,box-shadow .2s ease}
 #sowhat-archive .swa-feedback:hover{border-color:#d6d9df;box-shadow:0 5px 16px rgba(25,32,48,.09)}
-#sowhat-archive .swa-feedback span{font-size:18px;line-height:1}
-#sowhat-archive .swa-rail-rule{border:0;border-top:1px solid #e5e7eb;margin:26px 0}
-#sowhat-archive .swa-month-nav{background:#fff;border:1px solid #e3e6ea;border-radius:14px;box-shadow:0 4px 18px rgba(25,32,48,.05);overflow:hidden}
-#sowhat-archive .swa-rail-title{display:flex;align-items:center;gap:8px;padding:15px 16px;border-bottom:1px solid #eef0f3;font-size:16px;font-weight:800;letter-spacing:-.03em;color:#1b1d22}
-#sowhat-archive .swa-rail-title .swa-cal{width:18px;height:18px;color:#d12f30}
+#sowhat-archive .swa-feedback-icon{display:block;flex:none;width:20px;height:20px;fill:none;stroke:#d12f30;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#sowhat-archive .swa-toolbar-left{display:flex;align-items:center;gap:18px;min-width:0}
+#sowhat-archive .swa-month-nav{position:relative}
+#sowhat-archive .swa-month-nav summary{list-style:none;cursor:pointer;user-select:none}
+#sowhat-archive .swa-month-nav summary::-webkit-details-marker{display:none}
+#sowhat-archive .swa-month-panel{position:absolute;left:-6px;top:calc(100% + 8px);z-index:20;width:210px;background:#fff;border:1px solid #e3e6ea;border-radius:14px;box-shadow:0 10px 30px rgba(25,32,48,.12);overflow:hidden}
+#sowhat-archive .swa-rail-title{display:flex;align-items:center;gap:7px;padding:6px 4px;font-size:15px;font-weight:800;letter-spacing:-.03em;color:#1b1d22;white-space:nowrap}
+#sowhat-archive .swa-rail-title .swa-cal{width:17px;height:17px;color:#d12f30}
 #sowhat-archive .swa-cal{display:block;flex:none;width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 #sowhat-archive [data-swa-months]{max-height:250px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#cdd1d8 transparent;padding:8px}
-#sowhat-archive .swa-month-link{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:1px solid transparent;border-radius:9px;min-height:44px;padding:9px 12px 9px 14px;font-size:15px;font-weight:600;color:#3d424b;text-align:left;white-space:nowrap;transition:background-color .15s ease,color .15s ease}
+#sowhat-archive .swa-month-link{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:1px solid transparent;border-radius:9px;min-height:44px;padding:9px 12px 9px 14px;font-size:14.5px;font-weight:600;color:#3d424b;text-align:left;white-space:nowrap;transition:background-color .15s ease,color .15s ease}
 #sowhat-archive .swa-month-link:first-child{border-bottom:1px dashed #e3e6ea;border-radius:9px 9px 0 0;margin-bottom:4px}
 #sowhat-archive .swa-month-link+.swa-month-link{margin-top:3px}
 #sowhat-archive .swa-month-link:hover{background:#f6f7f9}
 #sowhat-archive .swa-month-link[aria-current=page]{font-weight:800;color:#c62a2b;background:#fdeeee}
 #sowhat-archive .swa-month-link span{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:1px 8px;border-radius:999px;font-size:13px;line-height:22px;background:#f1f3f5;color:#5f6570;font-weight:700;font-variant-numeric:tabular-nums}
 #sowhat-archive .swa-month-link[aria-current=page] span{background:#d12f30;color:#fff}
-#sowhat-archive .swa-form{margin-top:28px;width:300px;max-width:100%;scroll-margin-top:28px;border-radius:10px;background:#fff;overflow:hidden;box-shadow:0 5px 22px rgba(25,32,48,.065),0 1px 4px rgba(25,32,48,.035)}
+#sowhat-archive .swa-form{margin-top:30px;width:300px;max-width:100%;scroll-margin-top:28px;border-radius:10px;background:#fff;overflow:hidden;box-shadow:0 5px 22px rgba(25,32,48,.065),0 1px 4px rgba(25,32,48,.035)}
 #sowhat-archive .swa-form iframe{display:block;width:300px;max-width:100%;height:288px;border:0;background:#fff}
 #sowhat-archive .swa-content{min-width:0}
 #sowhat-archive .swa-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 0 18px;margin-bottom:22px;border-bottom:1px solid #e5e7eb;min-height:59px}
 #sowhat-archive .swa-grid-label{font-size:18px;font-weight:750;letter-spacing:-.04em;white-space:nowrap}
-#sowhat-archive .swa-count{font-size:14px;font-weight:500;color:#717782;margin-left:8px}
 #sowhat-archive .swa-tools{display:flex;align-items:center;gap:8px;min-width:0}
 #sowhat-archive .swa-tools[aria-hidden=true]{visibility:hidden}
 #sowhat-archive .swa-search{display:flex;align-items:center;gap:9px;border:1px solid #e0e3e8;border-radius:8px;background:#f7f8fa;height:44px;padding:0 14px;width:280px;min-width:0;margin:0}
@@ -123,10 +126,13 @@
 #sowhat-archive .swa-logo-junggi{height:19px}
 #sowhat-archive .swa-logo-bestexit{height:15.5px}
 @media(max-width:1180px){#sowhat-archive .swa-layout{gap:28px}#sowhat-archive .swa-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#sowhat-archive .swa-toolbar{flex-wrap:wrap;gap:14px}#sowhat-archive .swa-tools{width:100%}#sowhat-archive .swa-search{flex:1;width:auto}}
-@media(max-width:820px){#sowhat-archive .swa-wrap{padding:0 22px}#sowhat-archive .swa-top{min-height:78px}#sowhat-archive .swa-layout{display:flex;flex-direction:column;gap:27px;padding-top:28px;padding-bottom:36px}#sowhat-archive .swa-rail{display:contents}#sowhat-archive .swa-intro{order:1;width:100%}#sowhat-archive .swa-content{order:2;width:100%}#sowhat-archive .swa-form{order:3;margin:10px auto 0}#sowhat-archive h1{font-size:56px;letter-spacing:-2.5px}#sowhat-archive .swa-feedback{order:4;margin:4px auto 0}#sowhat-archive .swa-intro-copy{font-size:15px;margin-top:16px;max-width:540px}#sowhat-archive .swa-rail-rule{margin:23px 0}#sowhat-archive .swa-rail-title{padding:13px 14px}#sowhat-archive [data-swa-months]{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:12px 12px 14px}#sowhat-archive .swa-month-link,#sowhat-archive .swa-month-link:first-child{width:auto;flex:none;min-height:42px;border:1px solid #e2e5ea;border-radius:999px;margin:0;background:#fff;font-size:14px;padding:8px 8px 8px 14px;gap:10px}#sowhat-archive .swa-month-link[aria-current=page]{border-color:#f5cccc;background:#fdeeee}#sowhat-archive .swa-month-link+.swa-month-link{margin-top:0}#sowhat-archive .swa-toolbar{min-height:0;padding-bottom:17px}#sowhat-archive .swa-footer{grid-template-columns:1fr;justify-items:center;gap:12px}#sowhat-archive .swa-footer-copy p:first-child{justify-self:center}#sowhat-archive .swa-footer-logos{justify-content:center;margin-top:6px}}
+@media(max-width:820px){#sowhat-archive .swa-wrap{padding:0 22px}#sowhat-archive .swa-top{min-height:78px}#sowhat-archive .swa-layout{display:flex;flex-direction:column;gap:27px;padding-top:28px;padding-bottom:36px}#sowhat-archive .swa-rail{display:contents}#sowhat-archive .swa-intro{order:1;width:100%}#sowhat-archive .swa-form{order:2;margin:0 auto}#sowhat-archive .swa-content{order:4;width:100%}#sowhat-archive h1{font-size:56px;letter-spacing:-2.5px}#sowhat-archive .swa-feedback{order:3;margin:-8px auto 6px}#sowhat-archive .swa-intro-copy{margin-top:18px}#sowhat-archive .swa-toolbar{min-height:0;padding-bottom:17px}#sowhat-archive .swa-footer{grid-template-columns:1fr;justify-items:center;gap:12px}#sowhat-archive .swa-footer-copy p:first-child{justify-self:center}#sowhat-archive .swa-footer-logos{justify-content:center;margin-top:6px}}
 @media(max-width:550px){#sowhat-archive .swa-wrap{padding:0 20px}#sowhat-archive .swa-brand{gap:7px 13px}#sowhat-archive .swa-brand-context{font-size:20px}#sowhat-archive .swa-top{min-height:72px}#sowhat-archive .swa-grid{grid-template-columns:1fr;gap:22px}#sowhat-archive .swa-search input{font-size:16px}#sowhat-archive .swa-card h2{font-size:18px}#sowhat-archive .swa-meta{font-size:14px}#sowhat-archive .swa-volume{font-size:15px}#sowhat-archive .swa-footer-logos{gap:22px}#sowhat-archive .swa-logo-junggi{height:18px}#sowhat-archive .swa-logo-bestexit{height:14.5px}#sowhat-archive .swa-today{width:100%;justify-content:flex-start;font-size:14px;gap:6px 12px}#sowhat-archive .swa-weather{width:192px;padding-left:12px}#sowhat-archive .swa-weather-item{left:12px;right:auto}#sowhat-archive .swa-year{display:none}#sowhat-archive .swa-today{flex-wrap:nowrap}}
 @media(max-width:340px){#sowhat-archive .swa-wrap{padding:0 14px}#sowhat-archive .swa-brand-context{font-size:18px}#sowhat-archive .swa-tools{flex-wrap:wrap}#sowhat-archive .swa-search{flex-basis:100%}}
-@media(prefers-reduced-motion:reduce){#sowhat-archive .swa-cover img,#sowhat-archive .swa-card{transition:none}#sowhat-archive .swa-card a:hover img{transform:none}}
+@media(prefers-reduced-motion:reduce){#sowhat-archive .swa-cover img,#sowhat-archive .swa-card{transition:none}#sowhat-archive .swa-card a:hover img{transform:none}}@media(max-width:820px){#sowhat-archive .swa-intro{text-align:center}#sowhat-archive h1{font-size:clamp(34px,11vw,56px);letter-spacing:-.045em;white-space:nowrap}#sowhat-archive h1>span{display:inline}#sowhat-archive .swa-title-archive{margin-left:.24em}#sowhat-archive .swa-content{border-top:1px solid #e5e7eb;padding-top:28px}#sowhat-archive .swa-layout{padding-bottom:64px}#sowhat-archive .swa-toolbar-left{width:100%;justify-content:space-between}#sowhat-archive .swa-month-panel{left:auto;right:-6px}}
+@media(max-width:550px){#sowhat-archive .swa-top{flex-wrap:nowrap;gap:10px;min-height:0;padding:16px 0}#sowhat-archive .swa-brand-context{font-size:clamp(12.5px,4vw,18px);white-space:nowrap}#sowhat-archive .swa-today{width:auto;flex-wrap:nowrap;justify-content:flex-end;font-size:clamp(9.5px,2.9vw,13px);gap:8px;white-space:nowrap}#sowhat-archive .swa-weather{height:24px;padding-left:8px}#sowhat-archive .swa-weather-item{left:auto;right:0;height:24px;gap:4px}#sowhat-archive .swa-weather-icon,#sowhat-archive .swa-weather-icon svg{width:18px;height:18px}#sowhat-archive .swa-temp-icon{width:13px;height:13px}}
+@media(max-width:460px){#sowhat-archive .swa-weather-item>span:nth-child(2){display:none}#sowhat-archive .swa-today{gap:6px}#sowhat-archive .swa-weather{padding-left:6px}#sowhat-archive .swa-weather-item{gap:3px}#sowhat-archive .swa-top{gap:8px}}
+
 </style>
 <div id="sowhat-archive" data-canonical-url="https://sowhat.bestexit.co.kr/2026/05/" data-archive-month="2026-05" data-archive-base="https://sowhat.bestexit.co.kr/">
 <div class="swa-wrap"><header class="swa-top">
@@ -135,14 +141,14 @@
 </header></div>
 <div class="swa-wrap swa-layout">
   <aside class="swa-rail">
-    <div class="swa-intro"><p class="swa-eyebrow">SOWHAT ARCHIVE</p><h1><span class="swa-title-letter">쏘왓레터</span><span class="swa-title-archive">모아보기</span></h1><div class="swa-intro-copy"><p>경제 뉴스를 읽고도 <strong>그래서 어쩌라고?(So What)</strong> 싶으셨나요? 쏘왓레터는 복잡한 정보는 덜어내고, 바로 쓸 수 있는 ‘결론’만 전합니다.</p><p>막연한 정보 대신 선명한 판단 기준, 지금 쏘왓레터로 받아보세요.</p></div><hr class="swa-rail-rule"><div class="swa-month-nav"><p class="swa-rail-title"><svg class="swa-cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>발행월별 보기</p><div data-swa-months><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/">전체 뉴스레터 <span>115</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/11/">2026년 11월 <span>13</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/10/">2026년 10월 <span>20</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/09/">2026년 9월 <span>20</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/08/">2026년 8월 <span>20</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/07/">2026년 7월 <span>22</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/06/">2026년 6월 <span>9</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/05/" aria-current="page">2026년 5월 <span>4</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/04/">2026년 4월 <span>5</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/03/">2026년 3월 <span>2</span></a></div></div></div>
+    <div class="swa-intro"><p class="swa-eyebrow">SOWHAT ARCHIVE</p><h1><span class="swa-title-letter">쏘왓레터</span><span class="swa-title-archive">모아보기</span></h1><div class="swa-intro-copy"><p>매일 쏟아지는 경제 뉴스, 읽고 나서도<br><strong>그래서 어쩌라고?</strong><span class="swa-sub">(So What)</span> 싶으셨나요?</p><p>쏘왓레터는 복잡한 정보는 덜어내고<br>방향성 있는 <strong>결론</strong>만 전달합니다.</p><p>막연함 대신 선명한 기준을 원한다면<br><strong>지금 바로 쏘왓레터를 구독해보세요!</strong></p></div></div>
     <div class="swa-form" id="sowhat-subscribe-form" aria-label="쏘왓레터 구독 신청">
       <iframe src="https://junggiteam.github.io/naver-news/widgets/sowhat-subscribe.html?v=74c0e6b" title="중기이코노미 쏘왓레터 구독 신청" width="300" height="288" loading="eager" scrolling="no" style="display:block;width:300px;max-width:100%;height:288px;border:0;"></iframe>
     </div>
-    <a class="swa-feedback" href="https://www.bestexit.co.kr/sowhat-feedback" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">😍</span>중기이코노미 쏘왓레터에 할 말이 있어요</a>
+    <a class="swa-feedback" href="https://www.bestexit.co.kr/sowhat-feedback" target="_blank" rel="noopener noreferrer"><svg class="swa-feedback-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12.5a7.5 7.5 0 0 1-10.9 6.7L4 20.5l1.4-4.3A7.5 7.5 0 1 1 20 12.5Z"/><path d="M9 12.5h.01M12.5 12.5h.01M16 12.5h.01"/></svg>쏘왓레터에게 할 말이 있어요</a>
   </aside>
   <section class="swa-content" id="sowhat-archive-list" aria-label="쏘왓레터 발행호 모아보기">
-    <div class="swa-toolbar"><p class="swa-grid-label">2026년 5월 뉴스레터 <span class="swa-count" data-swa-count>4개</span></p><div class="swa-tools" data-swa-tools aria-hidden="true" inert><label class="swa-search"><span class="swa-search-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input type="search" placeholder="제목 또는 호수 검색" aria-label="뉴스레터 제목 또는 호수 검색" data-swa-search></label></div></div>
+    <div class="swa-toolbar"><div class="swa-toolbar-left"><p class="swa-grid-label">2026년 5월 뉴스레터</p><details class="swa-month-nav" data-swa-month-menu><summary class="swa-rail-title"><svg class="swa-cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>발행월별 보기</summary><div class="swa-month-panel"><div data-swa-months><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/">전체 뉴스레터 <span>115</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/11/">2026년 11월 <span>13</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/10/">2026년 10월 <span>20</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/09/">2026년 9월 <span>20</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/08/">2026년 8월 <span>20</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/07/">2026년 7월 <span>22</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/06/">2026년 6월 <span>9</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/05/" aria-current="page">2026년 5월 <span>4</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/04/">2026년 4월 <span>5</span></a><a class="swa-month-link" href="https://sowhat.bestexit.co.kr/2026/03/">2026년 3월 <span>2</span></a></div></div></details></div><div class="swa-tools" data-swa-tools aria-hidden="true" inert><label class="swa-search"><span class="swa-search-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><input type="search" placeholder="제목 또는 호수 검색" aria-label="뉴스레터 제목 또는 호수 검색" data-swa-search></label></div></div>
     <div class="swa-grid" data-swa-grid aria-live="polite"><article class="swa-card"><a href="https://stib.ee/EJpN" target="_blank" rel="noopener" aria-label="🏢가족 간 부동산 저가 거래, 싸게보다 순서가 먼저입니다! — 스티비 원문 새 창"><div class="swa-cover"><img src="https://img2.stibee.com/449890_3376858_1778126188265731820.png" alt="🏢가족 간 부동산 저가 거래, 싸게보다 순서가 먼저입니다!" width="630" height="360" loading="eager" decoding="async"></div><div class="swa-card-body"><p class="swa-meta"><span class="swa-volume">Vol. 011</span><time datetime="2026-05-28"><svg class="swa-cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>2026.05.28</time></p><h2 title="🏢가족 간 부동산 저가 거래, 싸게보다 순서가 먼저입니다!">🏢가족 간 부동산 저가 거래, 싸게보다 순서가 먼저입니다!</h2></div></a></article>
 <article class="swa-card"><a href="https://stib.ee/AAkN" target="_blank" rel="noopener" aria-label="💰내 돈 내고 하는 부동산 감정평가, 과연 필요할까? — 스티비 원문 새 창"><div class="swa-cover"><img src="https://img2.stibee.com/449890_3376858_1778126188265731820.png" alt="💰내 돈 내고 하는 부동산 감정평가, 과연 필요할까?" width="630" height="360" loading="eager" decoding="async"></div><div class="swa-card-body"><p class="swa-meta"><span class="swa-volume">Vol. 010</span><time datetime="2026-05-21"><svg class="swa-cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>2026.05.21</time></p><h2 title="💰내 돈 내고 하는 부동산 감정평가, 과연 필요할까?">💰내 돈 내고 하는 부동산 감정평가, 과연 필요할까?</h2></div></a></article>
 <article class="swa-card"><a href="https://stib.ee/DidN" target="_blank" rel="noopener" aria-label="🏢빌딩 승계, 토지 남기고 건물만 먼저 넘겨라! — 스티비 원문 새 창"><div class="swa-cover"><img src="https://img2.stibee.com/449890_3376858_1778126188265731820.png" alt="🏢빌딩 승계, 토지 남기고 건물만 먼저 넘겨라!" width="630" height="360" loading="eager" decoding="async"></div><div class="swa-card-body"><p class="swa-meta"><span class="swa-volume">Vol. 009</span><time datetime="2026-05-14"><svg class="swa-cal" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>2026.05.14</time></p><h2 title="🏢빌딩 승계, 토지 남기고 건물만 먼저 넘겨라!">🏢빌딩 승계, 토지 남기고 건물만 먼저 넘겨라!</h2></div></a></article>
@@ -339,7 +345,6 @@
   const grid = root.querySelector('[data-swa-grid]');
   const search = root.querySelector('[data-swa-search]');
   const more = root.querySelector('[data-swa-more]');
-  const count = root.querySelector('[data-swa-count]');
   const empty = root.querySelector('[data-swa-empty]');
   const months = root.querySelector('[data-swa-months]');
   const structured = root.querySelector('[data-swa-structured]');
@@ -435,12 +440,16 @@
     const fragment = document.createDocumentFragment();
     items.slice(0, limit).forEach((x, i) => fragment.append(card(x, i)));
     grid.replaceChildren(fragment);
-    count.textContent = items.length + '개';
     more.hidden = items.length <= limit;
     empty.hidden = items.length !== 0;
   }
   search.addEventListener('input', () => { limit = 9; render(); });
   more.addEventListener('click', () => { limit += 9; render(); });
+  const monthMenu = root.querySelector('[data-swa-month-menu]');
+  if (monthMenu) {
+    document.addEventListener('click', event => { if (monthMenu.open && !monthMenu.contains(event.target)) monthMenu.open = false; });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && monthMenu.open) { monthMenu.open = false; monthMenu.querySelector('summary').focus(); } });
+  }
   rebuildMonths();
   render();
   currentSignature = JSON.stringify(allItems);

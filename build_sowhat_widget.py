@@ -37,8 +37,9 @@ def render_widget(all_items: list[dict], archive_month: str = '') -> str:
     name = (month_name(archive_month) + ' ' if archive_month else '') + '쏘왓레터 모아보기'
     heading = '<span class="swa-title-letter">쏘왓레터</span><span class="swa-title-archive">모아보기</span>'
     intro = (
-        '경제 뉴스를 읽고도 <strong>그래서 어쩌라고?(So What)</strong> 싶으셨나요? ' + escape('쏘왓레터는 복잡한 정보는 덜어내고, 바로 쓸 수 있는 ‘결론’만 전합니다.'),
-        escape('막연한 정보 대신 선명한 판단 기준, 지금 쏘왓레터로 받아보세요.'),
+        '매일 쏟아지는 경제 뉴스, 읽고 나서도<br><strong>그래서 어쩌라고?</strong><span class="swa-sub">(So What)</span> 싶으셨나요?',
+        '쏘왓레터는 복잡한 정보는 덜어내고<br>방향성 있는 <strong>결론</strong>만 전달합니다.',
+        '막연함 대신 선명한 기준을 원한다면<br><strong>지금 바로 쏘왓레터를 구독해보세요!</strong>',
     )
     description = ''.join(f'<p>{line}</p>' for line in intro)
     structured = {'@context':'https://schema.org','@type':'CollectionPage','@id':canonical+'#archive','name':name,'url':canonical,'inLanguage':'ko-KR','isPartOf':{'@id':BASE+'#website'},'mainEntity':{'@type':'ItemList','numberOfItems':len(data),'itemListElement':[{'@type':'ListItem','position':i+1,'item':{'@type':'CreativeWork','name':x['title'],'url':x['url'],'datePublished':x['date'],**({'image':x['image']} if x.get('image') else {})}} for i,x in enumerate(data)]}}

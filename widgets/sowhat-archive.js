@@ -179,7 +179,6 @@
   const grid = root.querySelector('[data-swa-grid]');
   const search = root.querySelector('[data-swa-search]');
   const more = root.querySelector('[data-swa-more]');
-  const count = root.querySelector('[data-swa-count]');
   const empty = root.querySelector('[data-swa-empty]');
   const months = root.querySelector('[data-swa-months]');
   const structured = root.querySelector('[data-swa-structured]');
@@ -275,12 +274,16 @@
     const fragment = document.createDocumentFragment();
     items.slice(0, limit).forEach((x, i) => fragment.append(card(x, i)));
     grid.replaceChildren(fragment);
-    count.textContent = items.length + '개';
     more.hidden = items.length <= limit;
     empty.hidden = items.length !== 0;
   }
   search.addEventListener('input', () => { limit = 9; render(); });
   more.addEventListener('click', () => { limit += 9; render(); });
+  const monthMenu = root.querySelector('[data-swa-month-menu]');
+  if (monthMenu) {
+    document.addEventListener('click', event => { if (monthMenu.open && !monthMenu.contains(event.target)) monthMenu.open = false; });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && monthMenu.open) { monthMenu.open = false; monthMenu.querySelector('summary').focus(); } });
+  }
   rebuildMonths();
   render();
   currentSignature = JSON.stringify(allItems);
