@@ -137,12 +137,9 @@
 @media(max-width:480px){#sowhat-archive .swa-toolbar-left{flex-wrap:wrap;row-gap:12px}#sowhat-archive .swa-menus{width:100%;justify-content:flex-start;gap:20px}#sowhat-archive .swa-menus .swa-month-panel{left:-6px;right:auto}}
 /* Mobile: tighter lines in the intro (within and between paragraphs) and the footer sentence */
 @media(max-width:820px){#sowhat-archive .swa-intro-copy{line-height:1.45}#sowhat-archive .swa-intro-copy p+p{margin-top:10px}#sowhat-archive .swa-about{line-height:1.5}}
-/* '할 말이 있어요' button: megaphone on the right, sound waves 1 → 2 → 3 → none, repeating */
-#sowhat-archive .swa-feedback{gap:7px}
-#sowhat-archive .swa-feedback-icon{width:22px;height:22px;stroke-width:1.9;margin-right:-3px}
-#sowhat-archive .swa-wave{animation:1.8s step-end infinite}
-#sowhat-archive .swa-wave1{animation-name:swaWave1}#sowhat-archive .swa-wave2{animation-name:swaWave2}#sowhat-archive .swa-wave3{animation-name:swaWave3}
-@keyframes swaWave1{0%{opacity:1}75%{opacity:0}100%{opacity:0}}
-@keyframes swaWave2{0%{opacity:0}25%{opacity:1}75%{opacity:0}100%{opacity:0}}
-@keyframes swaWave3{0%{opacity:0}50%{opacity:1}75%{opacity:0}100%{opacity:0}}
-@media(prefers-reduced-motion:reduce){#sowhat-archive .swa-wave{animation:none;opacity:1}}
+/* '할 말이 있어요' button: waving hand on the right (17px), waves 4 times (~1 s), rests 1.5 s, repeats */
+#sowhat-archive .swa-feedback{gap:6px}
+#sowhat-archive .swa-feedback-icon{width:17px;height:17px;stroke-width:2.4;margin-top:-1px;overflow:visible}
+#sowhat-archive .swa-hand{transform-box:fill-box;transform-origin:50% 92%;animation:swaWave 2.5s ease-in-out infinite}
+@keyframes swaWave{0%{transform:rotate(0)}6%{transform:rotate(16deg)}13%{transform:rotate(-10deg)}20%{transform:rotate(16deg)}27%{transform:rotate(-10deg)}34%{transform:rotate(12deg)}40%{transform:rotate(0)}100%{transform:rotate(0)}}
+@media(prefers-reduced-motion:reduce){#sowhat-archive .swa-hand{animation:none}}
