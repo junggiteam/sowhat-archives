@@ -75,6 +75,17 @@ def extract(document: str) -> list[dict]:
 
 
 ISSUE_START, ISSUE_END = '<!--swa-issue-->', '<!--/swa-issue-->'
+# Naver Analytics for sowhat.bestexit.co.kr (separate site from bestexit.co.kr), on every generated page.
+NAVER_ANALYTICS = ('<script type="text/javascript" src="https://wcs.pstatic.net/wcslog.js"></script>'
+                   '<script type="text/javascript">if(!wcs_add) var wcs_add = {};wcs_add["wa"] = "1fb672d3a8b6f00";if(window.wcs) { wcs_do(); }</script>')
+
+
+def with_analytics(html: str) -> str:
+    """Insert the Naver Analytics tag right before the last </body> (once)."""
+    if 'wcs_add["wa"]' in html:
+        return html
+    cut = html.rfind('</body>')
+    return html[:cut] + NAVER_ANALYTICS + html[cut:] if cut >= 0 else html + NAVER_ANALYTICS
 
 
 def issue_path(volume: int) -> Path:
@@ -119,7 +130,7 @@ def write_issue_page(item: dict, document: str) -> None:
             'if("scrollRestoration" in history)history.scrollRestoration="manual";'
             'go();Array.prototype.forEach.call(document.images,function(i){if(!i.complete)i.addEventListener("load",go)});'
             'window.addEventListener("load",function(){go();setTimeout(go,300);setTimeout(stop,1500)});setTimeout(stop,8000);})();</script>'
-            + ISSUE_END)
+            + NAVER_ANALYTICS + ISSUE_END)
     # Root-relative assets (Stibee's page stylesheet) must keep loading from stibee.com.
     document = re.sub(r'(\s(?:src|href)=")/(?!/)', r'\1https://stibee.com/', document)
     document = document.replace('</head>', head + '</head>', 1)

@@ -193,15 +193,15 @@ def main() -> None:
     for key in ['',*months]:
         destination = ROOT / (key.replace('-','/') if key else '') / 'index.html'
         destination.parent.mkdir(parents=True,exist_ok=True)
-        destination.write_text(render_page(data,key),encoding='utf-8')
+        destination.write_text(sowhat_sections.with_analytics(render_page(data,key)),encoding='utf-8')
     cache = sowhat_sections.update(data['items'], fetch=args.refresh)
     for label, slug, _ in sowhat_sections.CATEGORIES:
         destination = ROOT / 'category' / slug / 'index.html'
         destination.parent.mkdir(parents=True,exist_ok=True)
-        destination.write_text(render_category_page(data,cache,label),encoding='utf-8')
+        destination.write_text(sowhat_sections.with_analytics(render_category_page(data,cache,label)),encoding='utf-8')
     reader = ROOT / 'read' / 'index.html'
     reader.parent.mkdir(exist_ok=True)
-    reader.write_text((ROOT / 'widgets/sowhat-reader.html').read_text(encoding='utf-8'),encoding='utf-8')
+    reader.write_text(sowhat_sections.with_analytics((ROOT / 'widgets/sowhat-reader.html').read_text(encoding='utf-8')),encoding='utf-8')
     (ROOT / 'CNAME').write_text('sowhat.bestexit.co.kr\n',encoding='utf-8')
     (ROOT / '.nojekyll').write_text('',encoding='utf-8')
     (ROOT / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /widgets/\nSitemap: '+CANONICAL+'sitemap.xml\n',encoding='utf-8')
