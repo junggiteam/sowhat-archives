@@ -143,3 +143,5 @@
 #sowhat-archive .swa-hand{transform-box:fill-box;transform-origin:50% 92%;animation:swaWave 2.5s ease-in-out infinite}
 @keyframes swaWave{0%{transform:rotate(0)}6%{transform:rotate(16deg)}13%{transform:rotate(-10deg)}20%{transform:rotate(16deg)}27%{transform:rotate(-10deg)}34%{transform:rotate(12deg)}40%{transform:rotate(0)}100%{transform:rotate(0)}}
 @media(prefers-reduced-motion:reduce){#sowhat-archive .swa-hand{animation:none}}
+/* PC: title fills the intro width (left and right edges line up with the text and the subscribe form) */
+@media(min-width:821px){#sowhat-archive h1{font-size:75.5px}}

@@ -335,6 +335,8 @@
       const pad = layout ? getComputedStyle(layout) : null;
       const avail = layout ? layout.clientWidth - parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight) : 300;
       const k = mobile ? Math.max(0.85, Math.min(avail / 300, 1.3)) : 1;
+      // PC: tell the form to use 24px side padding so it lines up with the intro text (mobile keeps 16px).
+      try { subscribeFrame.contentWindow.postMessage({ swaPc: !mobile }, 'https://junggiteam.github.io'); } catch (_) {}
       if (k === 1) {
         subscribe.style.width = subscribe.style.height = '';
         subscribeFrame.style.transform = subscribeFrame.style.transformOrigin = '';
@@ -348,6 +350,7 @@
       subscribeFrame.style.margin = (-5 * k) + 'px 0 0 ' + (-1 * k) + 'px';
     };
     fitSubscribe();
+    subscribeFrame.addEventListener('load', fitSubscribe);
     window.addEventListener('resize', fitSubscribe, { passive: true });
   }
   // PC: TOP button appears after scrolling down and returns smoothly to the top.

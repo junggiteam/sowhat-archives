@@ -173,6 +173,8 @@
 #sowhat-archive .swa-hand{transform-box:fill-box;transform-origin:50% 92%;animation:swaWave 2.5s ease-in-out infinite}
 @keyframes swaWave{0%{transform:rotate(0)}6%{transform:rotate(16deg)}13%{transform:rotate(-10deg)}20%{transform:rotate(16deg)}27%{transform:rotate(-10deg)}34%{transform:rotate(12deg)}40%{transform:rotate(0)}100%{transform:rotate(0)}}
 @media(prefers-reduced-motion:reduce){#sowhat-archive .swa-hand{animation:none}}
+/* PC: title fills the intro width (left and right edges line up with the text and the subscribe form) */
+@media(min-width:821px){#sowhat-archive h1{font-size:75.5px}}
 
 /* ---- Category pages (/category/<slug>/) ---- */
 #sowhat-archive .swa-cat{padding-top:40px;padding-bottom:56px}
@@ -570,6 +572,8 @@
       const pad = layout ? getComputedStyle(layout) : null;
       const avail = layout ? layout.clientWidth - parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight) : 300;
       const k = mobile ? Math.max(0.85, Math.min(avail / 300, 1.3)) : 1;
+      // PC: tell the form to use 24px side padding so it lines up with the intro text (mobile keeps 16px).
+      try { subscribeFrame.contentWindow.postMessage({ swaPc: !mobile }, 'https://junggiteam.github.io'); } catch (_) {}
       if (k === 1) {
         subscribe.style.width = subscribe.style.height = '';
         subscribeFrame.style.transform = subscribeFrame.style.transformOrigin = '';
@@ -583,6 +587,7 @@
       subscribeFrame.style.margin = (-5 * k) + 'px 0 0 ' + (-1 * k) + 'px';
     };
     fitSubscribe();
+    subscribeFrame.addEventListener('load', fitSubscribe);
     window.addEventListener('resize', fitSubscribe, { passive: true });
   }
   // PC: TOP button appears after scrolling down and returns smoothly to the top.
