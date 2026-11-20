@@ -147,7 +147,7 @@ def write_issue_page(item: dict, document: str) -> None:
     document = re.sub(re.escape(ISSUE_START) + '.*?' + re.escape(ISSUE_END), '', document, flags=re.S)
     labels = {slug: label for label, slug, _ in CATEGORIES}
     head = (f'{ISSUE_START}<meta name="robots" content="noindex,follow">'
-            f'<link rel="canonical" href="{item["url"]}">{ISSUE_END}')
+            f'<link rel="canonical" href="{item["url"]}"><link rel="icon" href="/favicon.ico?v=2" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=2">{ISSUE_END}')
     tail = (ISSUE_START +
             '<style>.swa-issue-bar{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;gap:8px;'
             'min-height:56px;box-sizing:border-box;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:#d12f30;color:#fff!important;'

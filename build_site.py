@@ -69,7 +69,11 @@ def page_head(title, description, canonical, share_title, share_description, gra
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="naver-site-verification" content="{escape(VERIFICATION['naver'],quote=True)}">
 <link rel="canonical" href="{canonical}">
-<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="icon" href="/favicon.ico?v=2" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png?v=2">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=2">
+<link rel="alternate" type="application/rss+xml" title="쏘왓레터" href="https://sowhat.bestexit.co.kr/rss.xml">
 <link rel="preconnect" href="https://img2.stibee.com">
 <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
 <meta property="og:type" content="website">
@@ -181,6 +185,36 @@ def sitemap(payload: dict, cache: dict | None = None) -> str:
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(root,encoding='unicode') + '\n'
 
 
+def rss(payload: dict, cache: dict, limit: int = 30) -> str:
+    """Latest issues for Naver/Google feed readers: each item points at its card on the month page."""
+    from email.utils import format_datetime
+    from datetime import datetime, timezone, timedelta
+    kst = timezone(timedelta(hours=9))
+    issues = cache.get('issues', {})
+    items = sorted(payload['items'], key=lambda x: x['date'], reverse=True)[:limit]
+    root = Element('rss', version='2.0')
+    ch = SubElement(root, 'channel')
+    SubElement(ch, 'title').text = '쏘왓레터'
+    SubElement(ch, 'link').text = CANONICAL
+    SubElement(ch, 'description').text = SITE_DESCRIPTION
+    SubElement(ch, 'language').text = 'ko'
+    if items:
+        SubElement(ch, 'lastBuildDate').text = format_datetime(datetime.fromisoformat(items[0]['date']).replace(hour=7, tzinfo=kst))
+    for x in items:
+        it = SubElement(ch, 'item')
+        vol = x.get('volume')
+        SubElement(it, 'title').text = (f'Vol.{vol} ' if vol else '') + x['title']
+        SubElement(it, 'link').text = month_url(x['date'][:7]) + (f'#vol-{vol}' if vol else '')
+        guid = SubElement(it, 'guid', isPermaLink='false'); guid.text = f'sowhat-{x["id"]}'
+        SubElement(it, 'pubDate').text = format_datetime(datetime.fromisoformat(x['date']).replace(hour=7, tzinfo=kst))
+        sections = issues.get(x['id'], {}).get('sections', [])
+        for label in dict.fromkeys(s['cat'] for s in sections):
+            SubElement(it, 'category').text = label
+        lines = [f"{s['cat']} | {s['headline']}" for s in sections]
+        SubElement(it, 'description').text = ' / '.join(lines) if lines else x['title']
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(root, encoding='unicode') + '\n'
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--refresh',action='store_true')
@@ -206,6 +240,7 @@ def main() -> None:
     (ROOT / '.nojekyll').write_text('',encoding='utf-8')
     (ROOT / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /widgets/\nSitemap: '+CANONICAL+'sitemap.xml\n',encoding='utf-8')
     (ROOT / 'sitemap.xml').write_text(sitemap(data,cache),encoding='utf-8')
+    (ROOT / 'rss.xml').write_text(rss(data,cache),encoding='utf-8')
     result['pages'] = 1 + len(months)
     result['categories'] = len(sowhat_sections.CATEGORIES)
     print(json.dumps(result))

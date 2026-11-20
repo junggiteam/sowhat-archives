@@ -213,6 +213,7 @@
   }
   function card(x, index) {
     const article = element('article', 'swa-card');
+    if (x.volume) article.id = 'vol-' + x.volume;
     const anchor = element('a');
     anchor.href = x.url;
     anchor.target = '_blank';
@@ -440,7 +441,18 @@
     }
     sessionStorage.removeItem('swa-return:' + location.pathname);
   } catch (_) {}
+  // Links like /2026/11/#vol-103 (RSS, shared links): open the list far enough to show that card, then scroll to it.
+  const volHash = /^#vol-(\d+)$/.exec(location.hash);
+  if (volHash) {
+    const at = dataset.findIndex(x => x.volume === Number(volHash[1]));
+    if (at >= limit) limit = Math.ceil((at + 1) / 9) * 9;
+  }
   render();
+  if (volHash) {
+    const jump = () => { const target = document.getElementById('vol-' + volHash[1]); if (target) target.scrollIntoView({ block: 'start' }); };
+    jump();
+    window.addEventListener('load', jump, { once: true });
+  }
   currentSignature = JSON.stringify(allItems);
 
   async function refresh() {
