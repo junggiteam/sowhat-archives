@@ -175,6 +175,8 @@
 @media(prefers-reduced-motion:reduce){#sowhat-archive .swa-hand{animation:none}}
 /* PC: title fills the intro width (left and right edges line up with the text and the subscribe form) */
 @media(min-width:821px){#sowhat-archive h1{font-size:75.5px}}
+/* PC: '할 말이 있어요' button edges on the same lines as the intro text and the subscribe form (24px in from the rail) */
+@media(min-width:821px){#sowhat-archive .swa-feedback{width:auto;max-width:none;margin-left:24px;margin-right:24px}}
 
 </style>
 <div id="sowhat-archive" data-canonical-url="https://sowhat.bestexit.co.kr/2026/06/" data-archive-month="2026-06" data-archive-base="https://sowhat.bestexit.co.kr/">
@@ -568,6 +570,62 @@
     fitSubscribe();
     subscribeFrame.addEventListener('load', fitSubscribe);
     window.addEventListener('resize', fitSubscribe, { passive: true });
+  }
+  // PC: fit the big title by its visible ink, whatever font the viewer has (Pretendard, Malgun Gothic,
+  // Apple SD Gothic Neo...). Each line's first letter starts exactly on the text line and the wider
+  // line's last letter ends exactly on the right edge of the intro text and the subscribe form.
+  const title = root.querySelector('.swa-intro h1');
+  const introBox = root.querySelector('.swa-intro');
+  if (title && introBox) {
+    const lines = Array.from(title.querySelectorAll('span'));
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const inkOf = (ch, font, size) => {
+      canvas.width = Math.ceil(size * 3); canvas.height = Math.ceil(size * 2);
+      ctx.font = font; ctx.textBaseline = 'top';
+      const ox = Math.round(size);
+      ctx.fillText(ch, ox, Math.round(size * 0.3));
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let min = Infinity, max = -1;
+      for (let i = 3; i < data.length; i += 4) {
+        if (data[i] > 60) { const x = ((i - 3) / 4) % canvas.width; if (x < min) min = x; if (x > max) max = x; }
+      }
+      if (max < 0) return { left: 0, right: 0 };
+      return { left: min - ox, right: ctx.measureText(ch).width - (max + 1 - ox) };
+    };
+    const fitTitle = () => {
+      const pc = window.matchMedia && window.matchMedia('(min-width: 821px)').matches;
+      title.style.fontSize = '';
+      title.style.whiteSpace = '';
+      lines.forEach(line => { line.style.marginLeft = ''; });
+      if (!pc || !lines.length) return;
+      // the empty side space of the last letter may stick out past the box; never let a line wrap
+      title.style.whiteSpace = 'nowrap';
+      const cs = getComputedStyle(introBox);
+      const inner = introBox.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      let size = parseFloat(getComputedStyle(title).fontSize);
+      let bearings = [];
+      for (let round = 0; round < 4; round++) {
+        const ts = getComputedStyle(title);
+        const font = ts.fontWeight + ' ' + size + 'px ' + ts.fontFamily;
+        const spacing = parseFloat(ts.letterSpacing) || 0;
+        bearings = lines.map(line => {
+          const text = line.textContent.trim();
+          return { first: inkOf(text[0], font, size).left, last: inkOf(text[text.length - 1], font, size).right };
+        });
+        const widths = lines.map((line, i) => {
+          const range = document.createRange(); range.selectNodeContents(line);
+          return range.getBoundingClientRect().width - spacing - bearings[i].first - bearings[i].last;
+        });
+        const widest = Math.max(...widths);
+        if (!(widest > 0)) break;
+        size = size * inner / widest;
+        title.style.fontSize = size.toFixed(2) + 'px';
+      }
+      lines.forEach((line, i) => { line.style.marginLeft = (-bearings[i].first).toFixed(2) + 'px'; });
+    };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitle); else fitTitle();
+    window.addEventListener('resize', fitTitle, { passive: true });
   }
   // PC: TOP button appears after scrolling down and returns smoothly to the top.
   const toTop = root.querySelector('[data-swa-totop]');

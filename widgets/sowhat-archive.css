@@ -145,3 +145,5 @@
 @media(prefers-reduced-motion:reduce){#sowhat-archive .swa-hand{animation:none}}
 /* PC: title fills the intro width (left and right edges line up with the text and the subscribe form) */
 @media(min-width:821px){#sowhat-archive h1{font-size:75.5px}}
+/* PC: '할 말이 있어요' button edges on the same lines as the intro text and the subscribe form (24px in from the rail) */
+@media(min-width:821px){#sowhat-archive .swa-feedback{width:auto;max-width:none;margin-left:24px;margin-right:24px}}
