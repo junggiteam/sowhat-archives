@@ -33,45 +33,85 @@ SITE = 'https://sowhat.bestexit.co.kr/'
 IMAGE_HOSTS = ('https://img.stibee.com/', 'https://img2.stibee.com/', 'https://resource.stibee.com/')
 
 
+HEAD_MARK = '\u2063H\u2063'  # marks a story headline (Stibee's 22px semibold title) while tokenising
+HEAD_RE = re.compile(r'<div style="[^"]*font-weight: ?600;[^"]*font-size: ?22px;[^"]*">(.*?)</div>', re.S)
+
+
 def extract(document: str) -> list[dict]:
-    """Return [{cat, headline, excerpt, image}] in page order."""
+    """Return [{cat, n, headline, excerpt, image}] in page order.
+
+    One category label can hold several stories (e.g. two M&A stories); each story
+    headline (22px semibold) starts its own entry, numbered n = 1, 2, ... within the
+    label. Older layouts without that headline style fall back to "first line after
+    the label is the headline".
+    """
     body = re.sub(r'<(script|style)[^>]*>.*?</\1>', '', document, flags=re.S | re.I)
+    body = HEAD_RE.sub(lambda m: '<div>' + HEAD_MARK + re.sub(r'<[^>]+>', ' ', m.group(1)) + '</div>', body)
     body = re.sub(r'<br\s*/?>', '\n', body, flags=re.I)
     tokens = []
     for m in re.finditer(r'<img[^>]*?src="([^"]+)"[^>]*>|>([^<]+)<', body):
         if m.group(1):
             tokens.append(('img', unescape(m.group(1))))
-        else:
-            for line in unescape(m.group(2)).split('\n'):
-                line = re.sub(r'\s+', ' ', line).strip()
-                if line:
-                    tokens.append(('text', line))
-    seen, sections, current = {}, [], None
+            continue
+        raw = unescape(m.group(2))
+        if raw.lstrip().startswith(HEAD_MARK):
+            text = re.sub(r'\s+', ' ', raw.replace(HEAD_MARK, ' ')).strip()
+            if text:
+                tokens.append(('head', text))
+            continue
+        for line in raw.split('\n'):
+            line = re.sub(r'\s+', ' ', line).strip()
+            if line:
+                tokens.append(('text', line))
+    seen, stories, cat, cur, count = {}, [], None, None, {}
+    # Some issues put the picture above the headline, others below it. An image seen before
+    # the section's first headline means "picture first": then each image waits for the next story.
+    pending, picture_first = '', False
     for kind, value in tokens:
         if kind == 'text' and value in LABELS:
             seen[value] = seen.get(value, 0) + 1
             if seen[value] == 2:
-                current = {'cat': value, 'headline': '', 'text': [], 'image': ''}
-                sections.append(current)
+                cat, cur, pending, picture_first = value, None, '', False
             continue
-        if current is None:
+        if cat is None:
             continue
-        if kind == 'img':
-            if not current['image'] and value.startswith(IMAGE_HOSTS):
-                current['image'] = value
-        elif not current['headline']:
-            current['headline'] = value
-        elif len(value) > 15 and sum(len(x) for x in current['text']) < 400:
-            current['text'].append(value)
+        if kind == 'head':
+            if value.upper().replace(' ', '').startswith('SOWHAT'):
+                continue  # the "SO WHAT" box title inside a story, not a new story
+            count[cat] = count.get(cat, 0) + 1
+            cur = {'cat': cat, 'n': count[cat], 'headline': value, 'text': [], 'image': pending}
+            pending = ''
+            stories.append(cur)
+        elif kind == 'img':
+            if not value.startswith(IMAGE_HOSTS):
+                continue
+            if cur is None:
+                pending, picture_first = value, True
+            elif picture_first:
+                pending = value  # the picture right above the next headline
+            elif not cur['image']:
+                cur['image'] = value
+        elif cur is None:
+            count[cat] = count.get(cat, 0) + 1
+            cur = {'cat': cat, 'n': count[cat], 'headline': value, 'text': [], 'image': pending}
+            pending = ''
+            stories.append(cur)
+        elif len(value) > 15 and sum(len(x) for x in cur['text']) < 400:
+            cur['text'].append(value)
     result = []
-    for s in sections:
+    for s in stories:
         if not s['headline'] or s['cat'] == '시황':
             continue
         excerpt = ' '.join(s['text'])
         if len(excerpt) > 220:
             excerpt = excerpt[:220].rsplit(' ', 1)[0] + '…'
-        result.append({'cat': s['cat'], 'headline': s['headline'][:160], 'excerpt': excerpt, 'image': s['image']})
+        result.append({'cat': s['cat'], 'n': s['n'], 'headline': s['headline'][:160], 'excerpt': excerpt, 'image': s['image']})
     return result
+
+
+def source_of_issue_page(volume: int) -> str:
+    """The original Stibee HTML kept inside our hosted copy (our additions removed)."""
+    return re.sub(re.escape(ISSUE_START) + '.*?' + re.escape(ISSUE_END), '', issue_path(volume).read_text(encoding='utf-8'), flags=re.S)
 
 
 ISSUE_START, ISSUE_END = '<!--swa-issue-->', '<!--/swa-issue-->'
@@ -92,9 +132,9 @@ def issue_path(volume: int) -> Path:
     return ISSUE_DIR / str(volume) / 'index.html'
 
 
-def issue_url(volume: int, slug: str) -> str:
-    """Hosted copy that opens with that category's section heading at the top."""
-    return f'{SITE}issue/{volume}/#c={slug}'
+def issue_url(volume: int, slug: str, n: int = 1) -> str:
+    """Hosted copy that opens with that category's section heading (or its n-th story) at the top."""
+    return f'{SITE}issue/{volume}/#c={slug}' + (f'&n={n}' if n and n > 1 else '')
 
 
 def write_issue_page(item: dict, document: str) -> None:
@@ -120,10 +160,15 @@ def write_issue_page(item: dict, document: str) -> None:
             '@media(min-width:821px){.swa-issue-bar{display:none!important}}</style>'
             f'<a class="swa-issue-bar" href="{SITE}" data-swa-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>쏘왓레터 모아보기로 가기</span></a>'
             '<script>(function(){var L=' + json.dumps(labels, ensure_ascii=False) + ',S="' + SITE + '";'
-            'var m=/(?:^|&)c=([a-z]+)/.exec(location.hash.slice(1));var label=m&&L[m[1]];if(!label)return;'
+            'var h=location.hash.slice(1),m=/(?:^|&)c=([a-z]+)/.exec(h),nm=/(?:^|&)n=(\\d+)/.exec(h),N=nm?+nm[1]:1;var label=m&&L[m[1]];if(!label)return;'
             'var back=document.querySelector("[data-swa-back]");if(back){back.href=S+"category/"+m[1]+"/?r=1";back.lastChild.textContent=label+" 모아보기로 가기";}'
             'function find(){var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,c=0;'
-            'while((n=w.nextNode())){if(n.nodeValue.replace(/\\s+/g," ").trim()===label&&++c===2)return n.parentElement;}return null}'
+            'var lab=null;while((n=w.nextNode())){if(n.nodeValue.replace(/\\s+/g," ").trim()===label&&++c===2){lab=n.parentElement;break}}'
+            # story 2, 3...: the N-th story headline (22px semibold, not the "SO WHAT" box) after the label
+            'if(!lab||N<2)return lab;var hs=document.querySelectorAll(\'div[style*="font-size: 22px"],div[style*="font-size:22px"]\'),k=0;'
+            'for(var i=0;i<hs.length;i++){var e=hs[i];if(!(lab.compareDocumentPosition(e)&4))continue;'
+            'if(!/font-weight: ?600/.test(e.getAttribute("style")||""))continue;'
+            'if(/^so ?what/i.test(e.textContent.trim()))continue;if(++k===N)return e;}return lab}'
             'var done=false;function go(){if(done)return;var el=find();if(!el)return;'
             'window.scrollTo(0,Math.max(0,el.getBoundingClientRect().top+(window.pageYOffset||0)-16));}'
             'function stop(){done=true}["wheel","touchstart","keydown","mousedown"].forEach(function(e){window.addEventListener(e,stop,{passive:true})});'
