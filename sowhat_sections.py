@@ -110,7 +110,7 @@ def write_issue_page(item: dict, document: str) -> None:
             f'<a class="swa-issue-bar" href="{SITE}" data-swa-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>쏘왓레터 모아보기로 가기</span></a>'
             '<script>(function(){var L=' + json.dumps(labels, ensure_ascii=False) + ',S="' + SITE + '";'
             'var m=/(?:^|&)c=([a-z]+)/.exec(location.hash.slice(1));var label=m&&L[m[1]];if(!label)return;'
-            'var back=document.querySelector("[data-swa-back]");if(back){back.href=S+"category/"+m[1]+"/";back.lastChild.textContent=label+" 모아보기로 가기";}'
+            'var back=document.querySelector("[data-swa-back]");if(back){back.href=S+"category/"+m[1]+"/?r=1";back.lastChild.textContent=label+" 모아보기로 가기";}'
             'function find(){var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,c=0;'
             'while((n=w.nextNode())){if(n.nodeValue.replace(/\\s+/g," ").trim()===label&&++c===2)return n.parentElement;}return null}'
             'var done=false;function go(){if(done)return;var el=find();if(!el)return;'

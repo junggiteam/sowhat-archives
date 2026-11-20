@@ -21,6 +21,33 @@
     if (bottom) bottom.classList.toggle('is-done', done);
   };
   apply();
+  // Coming back from an issue (link ends in ?r=1): reopen as many rows as before and return
+  // to the same scroll position. Saved in localStorage because issues open in a new tab.
+  const slugMatch = /\/category\/([a-z]+)\//.exec(location.pathname);
+  const slug = slugMatch ? slugMatch[1] : '';
+  const RETURN_KEY = 'swa-cat-return';
+  const store = { get() { try { return JSON.parse(localStorage.getItem(RETURN_KEY) || 'null'); } catch (_) { return null; } },
+                  set(v) { try { localStorage.setItem(RETURN_KEY, JSON.stringify(v)); } catch (_) {} } };
+  root.addEventListener('click', event => {
+    const link = event.target.closest && event.target.closest('.swa-cat-row a');
+    if (link) store.set({ slug, shown, y: Math.round(window.scrollY), t: Date.now() });
+  });
+  const params = new URLSearchParams(location.search);
+  if (params.get('r') === '1') {
+    params.delete('r');
+    const clean = location.pathname + (params.toString() ? '?' + params : '') + location.hash;
+    try { history.replaceState(history.state, '', clean); } catch (_) {}
+    const saved = store.get();
+    if (saved && saved.slug === slug && Date.now() - saved.t < 6 * 3600 * 1000) {
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      shown = Math.max(STEP, Math.min(rows.length, saved.shown || STEP));
+      apply();
+      const go = () => window.scrollTo(0, saved.y || 0);
+      go();
+      requestAnimationFrame(go);
+      window.addEventListener('load', go, { once: true });
+    }
+  }
   if (more) more.addEventListener('click', () => {
     const firstNew = shown;
     shown += STEP;
