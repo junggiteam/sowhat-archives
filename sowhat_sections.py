@@ -7,6 +7,7 @@ the headline, the section's own image and a short excerpt. Results are cached
 in data/sowhat_sections.json so every issue is fetched only once.
 """
 from html import unescape
+from html.parser import HTMLParser
 from pathlib import Path
 import json
 import re
@@ -194,6 +195,21 @@ def load_cache() -> dict:
     return {'schemaVersion': 1, 'issues': {}}
 
 
+class PublishedTime(HTMLParser):
+    """Read explicitly labelled publication metadata from the share page head."""
+
+    def __init__(self):
+        super().__init__()
+        self.value = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag != 'meta' or self.value is not None:
+            return
+        fields = dict(attrs)
+        if fields.get('property') == 'article:published_time' or fields.get('itemprop') == 'datePublished':
+            self.value = fields.get('content')
+
+
 def update(items: list[dict], fetch: bool) -> dict:
     """Fill the cache for eligible issues; network only when fetch=True."""
     cache = load_cache()
@@ -216,6 +232,10 @@ def update(items: list[dict], fetch: bool) -> dict:
         write_issue_page(item, document)
         if item['id'] not in issues:
             issues[item['id']] = {'volume': item['volume'], 'date': item['date'], 'url': item['url'], 'sections': sections}
+            metadata = PublishedTime()
+            metadata.feed(document.split('</head>', 1)[0])
+            if metadata.value:
+                issues[item['id']]['publishedAt'] = metadata.value
             changed = True
         time.sleep(0.3)
     if changed:

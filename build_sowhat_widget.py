@@ -19,7 +19,7 @@ def month_url(key: str) -> str:
     return BASE + key.replace('-', '/') + '/' if key else BASE
 
 
-def render_widget(all_items: list[dict], archive_month: str = '') -> str:
+def render_widget(all_items: list[dict], archive_month: str = '', summary_url: str = '') -> str:
     data = [x for x in all_items if not archive_month or x['date'].startswith(archive_month)]
     canonical = month_url(archive_month)
     cards = []
@@ -42,6 +42,8 @@ def render_widget(all_items: list[dict], archive_month: str = '') -> str:
         '막연함 대신 선명한 기준을 원한다면<br><strong>지금 바로 쏘왓레터를 구독해보세요!</strong>',
     )
     description = ''.join(f'<p>{line}</p>' for line in intro)
+    if summary_url:
+        description += f'<p><a class="swa-summary-link" href="{escape(summary_url, quote=True)}">최신 호 요약 보기</a></p>'
     structured = {'@context':'https://schema.org','@type':'CollectionPage','@id':canonical+'#archive','name':name,'url':canonical,'inLanguage':'ko-KR','isPartOf':{'@id':BASE+'#website'},'mainEntity':{'@type':'ItemList','numberOfItems':len(data),'itemListElement':[{'@type':'ListItem','position':i+1,'item':{'@type':'CreativeWork','name':x['title'],'url':x['url'],'datePublished':x['date'],**({'image':x['image']} if x.get('image') else {})}} for i,x in enumerate(data)]}}
     template = (WIDGETS / 'sowhat-archive-template.html').read_text(encoding='utf-8')
     label = month_name(archive_month) + ' 뉴스레터' if archive_month else '전체 뉴스레터'

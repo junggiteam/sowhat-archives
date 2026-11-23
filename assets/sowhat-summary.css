@@ -1,0 +1,13 @@
+body { color: #1b1d22; font: 17px/1.65 Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; overflow-wrap: anywhere; }
+.letter { max-width: 48rem; margin: 0 auto; padding: clamp(1.25rem, 5vw, 3rem); }
+.letter a { color: #a92326; text-underline-offset: .18em; }
+.letter nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.letter .issue-date { margin: 2rem 0 .35rem; color: #575c65; font-size: .95rem; }
+.letter h1 { margin: 0 0 1rem; font-size: clamp(1.65rem, 5vw, 2.55rem); line-height: 1.27; letter-spacing: -.035em; }
+.letter img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: .75rem; }
+.letter h2 { margin: 1.75rem 0 .55rem; font-size: 1.25rem; }
+.letter ul { padding-left: 1.3rem; }
+.letter li + li { margin-top: .95rem; }
+.letter li p { color: #40464e; margin: .2rem 0 0; }
+.letter .letter-actions { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #e5e7eb; }
+.letter a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }

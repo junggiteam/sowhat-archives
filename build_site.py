@@ -7,21 +7,26 @@ discovery by search engines. No account tokens or subscriber data are required.
 from pathlib import Path
 from html import escape
 from collections import Counter
+from datetime import datetime, timezone
+from email.utils import format_datetime
 import argparse
 import re
 import json
 import time
 import urllib.request
-from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.etree.ElementTree import Element, ParseError, SubElement, fromstring, register_namespace, tostring
 
 from build_sowhat_widget import build, render_widget, month_name, month_url
 import sowhat_sections
+import sowhat_summaries
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent
 CANONICAL = 'https://sowhat.bestexit.co.kr/'
 UPSTREAM = 'https://raw.githubusercontent.com/junggiteam/naver-news/main/data/sowhat_archive.json'
 VERIFICATION = json.loads((ROOT / 'site-verification.json').read_text(encoding='utf-8'))
+ATOM_NS = 'http://www.w3.org/2005/Atom'
+register_namespace('atom', ATOM_NS)
 
 
 def refresh() -> None:
@@ -57,9 +62,12 @@ def page_title(archive_month: str) -> str:
     return '중기이코노미 쏘왓레터 모아보기 | 경제·경영 뉴스레터'
 
 
-def page_head(title, description, canonical, share_title, share_description, graph):
+def page_head(title, description, canonical, share_title, share_description, graph, *, share_image='', article=False):
     structured = json.dumps({'@context':'https://schema.org','@graph':graph},ensure_ascii=False).replace('<','\\u003c')
-    image = CANONICAL+'assets/sowhat-og-v4.png'
+    image = escape(share_image or CANONICAL+'assets/sowhat-og-v4.png', quote=True)
+    image_details = '' if share_image else ('<meta property="og:image:width" content="1200">\n'
+                                            '<meta property="og:image:height" content="630">\n'
+                                            '<meta property="og:image:alt" content="결론이 있는 뉴스레터, 중기이코노미 쏘왓레터">')
     head = f'''<!doctype html>
 <html lang="ko"><head>
 <meta charset="utf-8">
@@ -76,16 +84,14 @@ def page_head(title, description, canonical, share_title, share_description, gra
 <link rel="alternate" type="application/rss+xml" title="쏘왓레터" href="https://sowhat.bestexit.co.kr/rss.xml">
 <link rel="preconnect" href="https://img2.stibee.com">
 <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{'article' if article else 'website'}">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="쏘왓레터">
 <meta property="og:title" content="{escape(share_title,quote=True)}">
 <meta property="og:description" content="{escape(share_description,quote=True)}">
 <meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{image}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="결론이 있는 뉴스레터, 중기이코노미 쏘왓레터">
+{image_details}
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{escape(share_title,quote=True)}">
 <meta name="twitter:description" content="{escape(share_description,quote=True)}">
@@ -97,7 +103,7 @@ def page_head(title, description, canonical, share_title, share_description, gra
     return head
 
 
-def render_page(payload: dict, archive_month: str = '') -> str:
+def render_page(payload: dict, archive_month: str = '', summaries: dict | None = None) -> str:
     items = [x for x in payload['items'] if not archive_month or x['date'].startswith(archive_month)]
     canonical = month_url(archive_month)
     title = page_title(archive_month)
@@ -114,7 +120,8 @@ def render_page(payload: dict, archive_month: str = '') -> str:
     share_title = title if archive_month else '결론이 있는 뉴스레터, 중기이코노미 쏘왓레터'
     share_description = description if archive_month else '복잡한 정보는 덜어내고 방향성 있는 결론만 전달하는 쏘왓레터를 구독해보세요'
     head = page_head(title, description, canonical, share_title, share_description, graph)
-    return head + render_widget(payload['items'],archive_month) + '</body></html>\n'
+    latest_summary = next((item for item in items if item['id'] in (summaries or {})), None)
+    return head + render_widget(payload['items'], archive_month, letter_url(latest_summary) if latest_summary else '') + '</body></html>\n'
 
 
 def category_url(slug: str) -> str:
@@ -173,7 +180,52 @@ def render_category_page(payload: dict, cache: dict, label: str) -> str:
     return head + '<style>\n' + css + '\n</style>\n' + body + '\n<script>\n' + js + '\n</script>\n</body></html>\n'
 
 
-def sitemap(payload: dict, cache: dict | None = None) -> str:
+def letter_url(item: dict) -> str:
+    return f'{CANONICAL}letters/{item["volume"]}/'
+
+
+def render_letter(item: dict, summary: dict, cache_entry: dict, adjacent: list[tuple[str, dict]]) -> str:
+    canonical = letter_url(item)
+    title = f'Vol. {item["volume"]} {item["title"]} | 쏘왓레터'
+    story_titles = ' · '.join(headline for _, headline, _ in summary['stories'][:3])
+    description = sowhat_summaries.short_excerpt(summary['introduction'] or story_titles, 155)
+    published = sowhat_summaries.published_at(item, cache_entry)
+    datetime_value = published.isoformat() if published else item['date']
+    display_date = published.strftime('%Y.%m.%d %H:%M KST') if published else item['date'].replace('-', '.')
+    image = item.get('image', '')
+    graph = [{
+        '@type': 'Article', '@id': canonical + '#summary', 'url': canonical,
+        'headline': item['title'], 'description': description, 'inLanguage': 'ko-KR',
+        'datePublished': datetime_value, 'mainEntityOfPage': canonical,
+        'publisher': {'@type': 'Organization', 'name': '중기이코노미'},
+    }]
+    if image:
+        graph[0]['image'] = image
+    head = page_head(title, description, canonical, title, description, graph, share_image=image, article=True)
+    head = head.replace('</head>', '<link rel="stylesheet" href="/assets/sowhat-summary.css">\n</head>', 1)
+    cover = f'\n    <img src="{escape(image, quote=True)}" alt="" width="630" height="360">' if image else ''
+    category_names = {category for category, _, _ in summary['stories']}
+    related = ''.join(f'<a href="{category_url(slug)}">{escape(label)} 뉴스레터</a>'
+                      for label, slug, _ in sowhat_sections.CATEGORIES if label in category_names)
+    other_issues = ''.join(f'<a href="{letter_url(other)}">{label} Vol. {other["volume"]}</a>' for label, other in adjacent)
+    categories = f'\n    <nav aria-label="관련 카테고리">{related}</nav>' if related else ''
+    month = month_url(item['date'][:7])
+    return head + f'''
+<main class="letter">
+  <nav aria-label="아카이브"><a href="{CANONICAL}">쏘왓레터 모아보기</a><a href="{month}">{month_name(item['date'][:7])}</a></nav>
+  <article>
+    <p class="issue-date">Vol. {item['volume']} · <time datetime="{datetime_value}">{display_date}</time></p>
+    <h1>{escape(item['title'])}</h1>{cover}
+    <section aria-labelledby="issue-summary"><h2 id="issue-summary">이번 호 요약</h2>{sowhat_summaries.body(summary)}</section>
+  </article>
+  <div class="letter-actions">
+    <nav aria-label="발행호"><a href="{escape(item['url'], quote=True)}">뉴스레터 읽기</a>{other_issues}</nav>{categories}
+  </div>
+</main></body></html>
+'''
+
+
+def sitemap(payload: dict, cache: dict | None = None, summaries: dict | None = None) -> str:
     root = Element('urlset',xmlns='http://www.sitemaps.org/schemas/sitemap/0.9')
     months = list(Counter(x['date'][:7] for x in payload['items']))
     for key in ['',*months]:
@@ -188,14 +240,14 @@ def sitemap(payload: dict, cache: dict | None = None) -> str:
                 entry = SubElement(root,'url')
                 SubElement(entry,'loc').text = category_url(slug)
                 SubElement(entry,'lastmod').text = groups[label][0][0]['date']
+    for item in payload['items']:
+        if item['id'] in (summaries or {}):
+            SubElement(SubElement(root, 'url'), 'loc').text = letter_url(item)
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(root,encoding='unicode') + '\n'
 
 
-def rss(payload: dict, cache: dict, limit: int = 30) -> str:
-    """Latest issues for Naver/Google feed readers: each item points at its card on the month page."""
-    from email.utils import format_datetime
-    from datetime import datetime, timezone, timedelta
-    kst = timezone(timedelta(hours=9))
+def rss(payload: dict, cache: dict, summaries: dict, limit: int = 30, *, previous: str = '') -> str:
+    """Publish the latest issues with stable GUIDs and the summary page's full editorial text."""
     issues = cache.get('issues', {})
     items = sorted(payload['items'], key=lambda x: x['date'], reverse=True)[:limit]
     root = Element('rss', version='2.0')
@@ -204,20 +256,36 @@ def rss(payload: dict, cache: dict, limit: int = 30) -> str:
     SubElement(ch, 'link').text = CANONICAL
     SubElement(ch, 'description').text = SITE_DESCRIPTION
     SubElement(ch, 'language').text = 'ko'
-    if items:
-        SubElement(ch, 'lastBuildDate').text = format_datetime(datetime.fromisoformat(items[0]['date']).replace(hour=7, tzinfo=kst))
+    SubElement(ch, f'{{{ATOM_NS}}}link', href=CANONICAL+'rss.xml', rel='self', type='application/rss+xml')
     for x in items:
         it = SubElement(ch, 'item')
         vol = x.get('volume')
         SubElement(it, 'title').text = (f'Vol.{vol} ' if vol else '') + x['title']
-        SubElement(it, 'link').text = month_url(x['date'][:7]) + (f'#vol-{vol}' if vol else '')
+        summary = summaries.get(x['id'])
+        SubElement(it, 'link').text = letter_url(x) if summary else month_url(x['date'][:7]) + (f'#vol-{vol}' if vol else '')
         guid = SubElement(it, 'guid', isPermaLink='false'); guid.text = f'sowhat-{x["id"]}'
-        SubElement(it, 'pubDate').text = format_datetime(datetime.fromisoformat(x['date']).replace(hour=7, tzinfo=kst))
-        sections = issues.get(x['id'], {}).get('sections', [])
+        entry = issues.get(x['id'], {})
+        published = sowhat_summaries.published_at(x, entry)
+        if published:
+            SubElement(it, 'pubDate').text = format_datetime(published)
+        sections = entry.get('sections', [])
         for label in dict.fromkeys(s['cat'] for s in sections):
             SubElement(it, 'category').text = label
-        lines = [f"{s['cat']} | {s['headline']}" for s in sections]
-        SubElement(it, 'description').text = ' / '.join(lines) if lines else x['title']
+        SubElement(it, 'description').text = sowhat_summaries.body(summary) if summary else escape(x['title'])
+    stamp = None
+    try:
+        old = fromstring(previous)
+        old_channel = old.find('channel')
+        old_stamp = old_channel.find('lastBuildDate') if old_channel is not None else None
+        if old_stamp is not None:
+            old_channel.remove(old_stamp)
+            if tostring(old) == tostring(root):
+                stamp = old_stamp.text
+    except ParseError:
+        pass
+    last_build = Element('lastBuildDate')
+    last_build.text = stamp or format_datetime(datetime.now(timezone.utc).replace(microsecond=0), usegmt=True)
+    ch.insert(5, last_build)
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(root, encoding='unicode') + '\n'
 
 
@@ -229,12 +297,29 @@ def main() -> None:
         refresh()
     result = build()
     data = json.loads((ROOT / 'data/sowhat_archive.json').read_text(encoding='utf-8'))
+    cache = sowhat_sections.update(data['items'], fetch=args.refresh)
+    summaries = sowhat_summaries.collect(data['items'], cache)
     months = list(Counter(x['date'][:7] for x in data['items']))
     for key in ['',*months]:
         destination = ROOT / (key.replace('-','/') if key else '') / 'index.html'
         destination.parent.mkdir(parents=True,exist_ok=True)
-        destination.write_text(sowhat_sections.with_analytics(render_page(data,key)),encoding='utf-8')
-    cache = sowhat_sections.update(data['items'], fetch=args.refresh)
+        destination.write_text(sowhat_sections.with_analytics(render_page(data, key, summaries)), encoding='utf-8')
+    letters = [item for item in data['items'] if item['id'] in summaries]
+    letter_dir = ROOT / 'letters'
+    for index, item in enumerate(letters):
+        adjacent = []
+        if index + 1 < len(letters):
+            adjacent.append(('이전 호', letters[index + 1]))
+        if index > 0:
+            adjacent.append(('다음 호', letters[index - 1]))
+        destination = letter_dir / str(item['volume']) / 'index.html'
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        html = render_letter(item, summaries[item['id']], cache.get('issues', {}).get(item['id'], {}), adjacent)
+        destination.write_text(sowhat_sections.with_analytics(html), encoding='utf-8')
+    volumes = {str(item['volume']) for item in letters}
+    for old in letter_dir.glob('*/index.html'):
+        if old.parent.name.isdecimal() and old.parent.name not in volumes:
+            old.unlink()
     for label, slug, _ in sowhat_sections.CATEGORIES:
         destination = ROOT / 'category' / slug / 'index.html'
         destination.parent.mkdir(parents=True,exist_ok=True)
@@ -245,10 +330,13 @@ def main() -> None:
     (ROOT / 'CNAME').write_text('sowhat.bestexit.co.kr\n',encoding='utf-8')
     (ROOT / '.nojekyll').write_text('',encoding='utf-8')
     (ROOT / 'robots.txt').write_text('User-agent: *\nAllow: /\nDisallow: /widgets/\nSitemap: '+CANONICAL+'sitemap.xml\n',encoding='utf-8')
-    (ROOT / 'sitemap.xml').write_text(sitemap(data,cache),encoding='utf-8')
-    (ROOT / 'rss.xml').write_text(rss(data,cache),encoding='utf-8')
+    (ROOT / 'sitemap.xml').write_text(sitemap(data, cache, summaries), encoding='utf-8')
+    feed = ROOT / 'rss.xml'
+    previous = feed.read_text(encoding='utf-8') if feed.exists() else ''
+    feed.write_text(rss(data, cache, summaries, previous=previous), encoding='utf-8')
     result['pages'] = 1 + len(months)
     result['categories'] = len(sowhat_sections.CATEGORIES)
+    result['letters'] = len(letters)
     print(json.dumps(result))
 
 

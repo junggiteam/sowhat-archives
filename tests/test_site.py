@@ -1,9 +1,12 @@
 import json
 import unittest
+from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 from xml.etree import ElementTree
 
-from build_site import CANONICAL, render_page, sitemap
+from build_site import CANONICAL, letter_url, render_letter, render_page, rss, sitemap
+from sowhat_sections import PublishedTime
+from sowhat_summaries import body, collect, published_at
 
 
 class Page(HTMLParser):
@@ -84,6 +87,40 @@ class SeoTests(unittest.TestCase):
         page = Page(render_page(data))
         self.assertEqual(len(page.structured),2)
         self.assertEqual(len(page.cards),3)
+
+    def test_letters_and_feed_share_editorial_body_url_and_guid(self):
+        data = fixture()
+        cache = {'issues': {'new': {'sections': [{'cat': 'M&A', 'headline': '기업 매각 & 인수', 'excerpt': '첫 문장입니다. 다음 문장.'}]}}}
+        summaries = collect(data['items'], cache)
+        url = CANONICAL + 'letters/115/'
+        newest = data['items'][0]
+        self.assertEqual(letter_url(newest), url)
+        html = render_letter(newest, summaries['new'], cache['issues']['new'], [])
+        self.assertEqual(Page(html).canonicals, [url])
+        self.assertIn(CANONICAL + 'category/ma/', html)
+        self.assertIn(body(summaries['new']), html)
+        self.assertIn(url, sitemap(data, summaries=summaries))
+        self.assertIn(url, render_page(data, summaries=summaries))
+        xml = rss(data, cache, summaries)
+        first, fallback, _ = ElementTree.fromstring(xml).findall('channel/item')
+        self.assertEqual(first.findtext('link'), url)
+        self.assertEqual(first.findtext('guid'), 'sowhat-new')
+        self.assertEqual(first.findtext('description'), body(summaries['new']))
+        self.assertEqual(fallback.findtext('link'), CANONICAL + '2026/11/#vol-114')
+        self.assertIsNone(first.find('pubDate'))
+        self.assertEqual(rss(data, cache, summaries, previous=xml), xml)
+
+    def test_rss_only_uses_verified_time_on_archive_date_in_korea(self):
+        data = fixture()
+        newest = data['items'][0]
+        for invalid in ('2026-11-18', '2026-11-18T07:00:00', '2026-11-18T18:00:00Z'):
+            self.assertIsNone(published_at(newest, {'publishedAt': invalid}))
+        parser = PublishedTime()
+        parser.feed('<meta property="article:modified_time" content="2026-11-18T01:00:00Z">'
+                    '<meta property="article:published_time" content="2026-11-18T07:02:00Z">')
+        cache = {'issues': {'new': {'publishedAt': parser.value}}}
+        stamp = ElementTree.fromstring(rss(data, cache, {})).findtext('channel/item/pubDate')
+        self.assertEqual(parsedate_to_datetime(stamp).isoformat(), '2026-11-18T16:02:00+09:00')
 
 
 if __name__ == '__main__':
