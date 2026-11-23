@@ -125,3 +125,12 @@
 #sowhat-archive .swa-letter-cover{position:relative;aspect-ratio:auto;min-height:240px}
 #sowhat-archive .swa-letter-cover img{position:absolute;inset:0}}
 @media(min-width:821px) and (max-width:1100px){#sowhat-archive .swa-letter-hero h1{font-size:34px}#sowhat-archive .swa-letter-intro{font-size:17px}}
+/* ---- revision 5: arrows keep moving while hovered; summary rows a little larger ---- */
+@media(hover:hover){
+#sowhat-archive .swa-letter-back:hover svg,#sowhat-archive .swa-letter-back:focus-visible svg{transform:none;animation:swaArrowL .8s ease-in-out infinite alternate}
+#sowhat-archive .swa-sum-row>a:hover .swa-sum-go svg,#sowhat-archive .swa-sum-row>a:focus-visible .swa-sum-go svg{transform:none;animation:swaArrowR .8s ease-in-out infinite alternate}}
+@media(prefers-reduced-motion:reduce){#sowhat-archive .swa-letter-back svg,#sowhat-archive .swa-sum-go svg{animation:none!important}}
+#sowhat-archive .swa-sum-cat{font-size:14.5px}
+#sowhat-archive .swa-sum-h{font-size:19px}
+#sowhat-archive .swa-sum-x{font-size:16px;margin-top:7px}
+@media(max-width:820px){#sowhat-archive .swa-sum-cat{font-size:14px}#sowhat-archive .swa-sum-h{font-size:17.5px}#sowhat-archive .swa-sum-x{font-size:15px}}
