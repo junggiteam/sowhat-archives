@@ -103,7 +103,7 @@ def page_head(title, description, canonical, share_title, share_description, gra
     return head
 
 
-def render_page(payload: dict, archive_month: str = '', summaries: dict | None = None) -> str:
+def render_page(payload: dict, archive_month: str = '') -> str:
     items = [x for x in payload['items'] if not archive_month or x['date'].startswith(archive_month)]
     canonical = month_url(archive_month)
     title = page_title(archive_month)
@@ -120,8 +120,7 @@ def render_page(payload: dict, archive_month: str = '', summaries: dict | None =
     share_title = title if archive_month else '결론이 있는 뉴스레터, 중기이코노미 쏘왓레터'
     share_description = description if archive_month else '복잡한 정보는 덜어내고 방향성 있는 결론만 전달하는 쏘왓레터를 구독해보세요'
     head = page_head(title, description, canonical, share_title, share_description, graph)
-    latest_summary = next((item for item in items if item['id'] in (summaries or {})), None)
-    return head + render_widget(payload['items'], archive_month, letter_url(latest_summary) if latest_summary else '') + '</body></html>\n'
+    return head + render_widget(payload['items'], archive_month) + '</body></html>\n'
 
 
 def category_url(slug: str) -> str:
@@ -303,7 +302,7 @@ def main() -> None:
     for key in ['',*months]:
         destination = ROOT / (key.replace('-','/') if key else '') / 'index.html'
         destination.parent.mkdir(parents=True,exist_ok=True)
-        destination.write_text(sowhat_sections.with_analytics(render_page(data, key, summaries)), encoding='utf-8')
+        destination.write_text(sowhat_sections.with_analytics(render_page(data, key)), encoding='utf-8')
     letters = [item for item in data['items'] if item['id'] in summaries]
     letter_dir = ROOT / 'letters'
     for index, item in enumerate(letters):
