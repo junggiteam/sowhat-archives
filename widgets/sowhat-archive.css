@@ -153,14 +153,13 @@
 @media(min-width:821px){#sowhat-archive h1{font-size:75.5px}}
 /* PC: '할 말이 있어요' button edges on the same lines as the intro text and the subscribe form (24px in from the rail) */
 @media(min-width:821px){#sowhat-archive .swa-feedback{width:auto;max-width:none;margin-left:24px;margin-right:24px}}
-/* '최신호 요약 보기': same look as the two menus beside it; red text (no underline) on hover / when current */
-#sowhat-archive .swa-latest-link{text-decoration:none;transition:color .15s}
-#sowhat-archive .swa-latest-link:hover,#sowhat-archive .swa-latest-link:focus-visible,#sowhat-archive .swa-latest-link[aria-current]{color:#d12f30}
 /* three menus: when the label and menus don't fit on one line (narrow PC / tablet), the menus drop under the label */
 #sowhat-archive .swa-toolbar-left{flex-wrap:wrap;row-gap:12px}
-/* phones: the three menus share the row in three equal columns (same icons and wording) */
-@media(max-width:480px){
-#sowhat-archive .swa-menus{display:grid;grid-template-columns:repeat(3,auto);justify-content:space-between;gap:0;width:100%}
-#sowhat-archive .swa-menus .swa-rail-title{padding:6px 0;gap:5px;font-size:14px;letter-spacing:-.04em}
-#sowhat-archive .swa-menus .swa-rail-title .swa-cal{width:15px;height:15px}}
-@media(max-width:374px){#sowhat-archive .swa-menus .swa-rail-title{font-size:12.5px;gap:4px}#sowhat-archive .swa-menus .swa-rail-title .swa-cal{width:13px;height:13px}}
+/* footer: small '최신호 요약 Vol. N →' line under the description (right on PC, centred on phones) */
+#sowhat-archive .swa-footer-text{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:0}
+#sowhat-archive .swa-footer-latest{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#6b707a;letter-spacing:-.02em;text-decoration:none;transition:color .15s}
+#sowhat-archive .swa-footer-latest b{font-weight:800;color:#d12f30}
+#sowhat-archive .swa-footer-latest svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+#sowhat-archive .swa-footer-latest:hover{color:#d12f30}
+#sowhat-archive .swa-footer-latest:hover svg{transform:translateX(3px)}
+@media(max-width:820px){#sowhat-archive .swa-footer-text{align-items:center}}

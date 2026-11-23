@@ -37,6 +37,19 @@ def latest_url(items: list[dict], summaries: dict) -> str:
     return letter_url(rows[0]) if rows else SITE
 
 
+def latest_issue(items: list[dict]) -> dict | None:
+    """Newest published issue whose sections are extracted (Vol. 16 onward) = newest summary page."""
+    with_sections = {k for k, e in sowhat_sections.load_cache().get('issues', {}).items() if e.get('sections')}
+    rows = [x for x in items if (x.get('volume') or 0) >= FIRST_NAV_VOLUME and x['id'] in with_sections]
+    return max(rows, key=lambda x: (x['date'], x['volume'])) if rows else None
+
+
+def fill_template(template: str, items: list[dict]) -> str:
+    latest = latest_issue(items)
+    return (template.replace('__LATEST_URL__', letter_url(latest) if latest else SITE)
+                    .replace('__LATEST_VOL__', str(latest['volume']) if latest else ''))
+
+
 def _first_sentence(text: str, limit: int = 110) -> str:
     text = ' '.join(text.split())
     sentence = re.split(r'(?<=[.!?요다])\s+', text, maxsplit=1)[0]

@@ -7,7 +7,7 @@ discovery by search engines. No account tokens or subscriber data are required.
 from pathlib import Path
 from html import escape
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import timedelta, datetime, timezone
 from email.utils import format_datetime
 import argparse
 import re
@@ -60,7 +60,7 @@ SITE_DESCRIPTION = '쏘왓레터는 경제 흐름과 기업 경영에 필요한 
 def page_title(archive_month: str) -> str:
     if archive_month:
         return month_name(archive_month) + ' 경제·경영 뉴스레터 모아보기 | 쏘왓레터'
-    return '중기이코노미 쏘왓레터 모아보기 | 경제·경영 뉴스레터'
+    return '중기이코노미 쏘왓레터 | 경제 뉴스레터·경영 뉴스레터'
 
 
 def page_head(title, description, canonical, share_title, share_description, graph, *, share_image='', article=False):
@@ -151,7 +151,7 @@ def render_category_page(payload: dict, cache: dict, label: str) -> str:
          'mainEntity':{'@type':'ItemList','numberOfItems':len(rows),'itemListElement':[{'@type':'ListItem','position':n+1,'item':{'@type':'CreativeWork','name':sec['headline'],'url':it['url'],'datePublished':it['date']}} for n,(it,sec) in enumerate(rows)]}},
     ]
     head = page_head(title, description, canonical, title, description, graph)
-    template = (ROOT / 'widgets/sowhat-archive-template.html').read_text(encoding='utf-8')
+    template = sowhat_letter_page.fill_template((ROOT / 'widgets/sowhat-archive-template.html').read_text(encoding='utf-8'), payload['items'])
     top = re.search(r'<div class="swa-wrap"><header class="swa-top">.*?</header></div>', template, re.S).group(0)
     footer = re.search(r'<div class="swa-wrap"><footer class="swa-footer[^"]*">.*?</footer></div>', template, re.S).group(0).replace('src="/assets/', 'src="'+CANONICAL+'assets/')
     totop = re.search(r'<a class="swa-totop".*?</a>', template, re.S).group(0)
@@ -203,6 +203,7 @@ def render_letter(item: dict, summary: dict, cache_entry: dict, newer: dict | No
         graph[0]['image'] = image
     head = page_head(title, description, canonical, title, description, graph, share_image=image, article=True)
     template = (ROOT / 'widgets/sowhat-archive-template.html').read_text(encoding='utf-8')
+    template = sowhat_letter_page.fill_template(template, json.loads((ROOT / 'data/sowhat_archive.json').read_text(encoding='utf-8'))['items'])
     css = (ROOT / 'widgets/sowhat-archive.css').read_text(encoding='utf-8')
     letter_css = (ROOT / 'widgets/sowhat-letter.css').read_text(encoding='utf-8')
     js = (ROOT / 'widgets/sowhat-archive.js').read_text(encoding='utf-8')
@@ -230,9 +231,37 @@ def sitemap(payload: dict, cache: dict | None = None, summaries: dict | None = N
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(root,encoding='unicode') + '\n'
 
 
-def rss(payload: dict, cache: dict, summaries: dict, limit: int = 30, *, previous: str = '') -> str:
+FIRST_SEEN = ROOT / 'data' / 'sowhat_first_seen.json'
+
+
+def record_first_seen(items: list[dict], now: datetime | None = None) -> dict:
+    """When each issue first appeared on this archive (= its RSS publish time).
+
+    Issues already here before this was added are stored as null (time unknown, so no
+    made-up time); every issue that shows up later gets the build time that added it.
+    """
+    kst = timezone(timedelta(hours=9))
+    try:
+        seen = json.loads(FIRST_SEEN.read_text(encoding='utf-8'))
+    except FileNotFoundError:
+        seen = None
+    if seen is None:
+        seen = {x['id']: None for x in items}
+    stamp = (now or datetime.now(kst)).astimezone(kst).replace(microsecond=0).isoformat()
+    changed = False
+    for x in items:
+        if x['id'] not in seen:
+            seen[x['id']] = stamp
+            changed = True
+    if changed or not FIRST_SEEN.exists():
+        FIRST_SEEN.write_text(json.dumps(seen, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    return seen
+
+
+def rss(payload: dict, cache: dict, summaries: dict, limit: int = 30, *, previous: str = '', first_seen: dict | None = None) -> str:
     """Publish the latest issues with stable GUIDs and the summary page's full editorial text."""
     issues = cache.get('issues', {})
+    first_seen = first_seen or {}
     items = sorted(payload['items'], key=lambda x: x['date'], reverse=True)[:limit]
     root = Element('rss', version='2.0')
     ch = SubElement(root, 'channel')
@@ -250,6 +279,8 @@ def rss(payload: dict, cache: dict, summaries: dict, limit: int = 30, *, previou
         guid = SubElement(it, 'guid', isPermaLink='false'); guid.text = f'sowhat-{x["id"]}'
         entry = issues.get(x['id'], {})
         published = sowhat_summaries.published_at(x, entry)
+        if not published and first_seen.get(x['id']):
+            published = datetime.fromisoformat(first_seen[x['id']])
         if published:
             SubElement(it, 'pubDate').text = format_datetime(published)
         sections = entry.get('sections', [])
@@ -318,7 +349,7 @@ def main() -> None:
     (ROOT / 'sitemap.xml').write_text(sitemap(data, cache, summaries), encoding='utf-8')
     feed = ROOT / 'rss.xml'
     previous = feed.read_text(encoding='utf-8') if feed.exists() else ''
-    feed.write_text(rss(data, cache, summaries, previous=previous), encoding='utf-8')
+    feed.write_text(rss(data, cache, summaries, previous=previous, first_seen=record_first_seen(data['items'])), encoding='utf-8')
     result['pages'] = 1 + len(months)
     result['categories'] = len(sowhat_sections.CATEGORIES)
     result['letters'] = len(letters)
