@@ -69,3 +69,47 @@
 /* the archive keeps its own big title on one line on phones; issue titles must wrap */
 #sowhat-archive .swa-letter-hero h1{white-space:normal}
 #sowhat-archive .swa-letter-text{min-width:0}
+/* ---- revision 2: smaller back link, tighter hero, simple summary list ---- */
+#sowhat-archive .swa-letter-back .swa-brand-context{font-size:16px;font-weight:700;letter-spacing:-.03em}
+#sowhat-archive .swa-letter-back svg{width:18px;height:18px}
+#sowhat-archive .swa-letter-main{padding-top:36px}
+#sowhat-archive .swa-letter-hero{grid-template-columns:minmax(0,1fr) minmax(0,.82fr);gap:40px;padding-bottom:36px}
+#sowhat-archive .swa-letter-meta{gap:10px;margin-bottom:12px}
+#sowhat-archive .swa-letter-cat{font-size:13px;font-weight:800;color:#d12f30;padding:2px 8px;border-radius:999px;background:#fdecec}
+#sowhat-archive .swa-letter-hero h1{font-size:36px;line-height:1.28}
+#sowhat-archive .swa-letter-intro{font-size:16.5px;line-height:1.7;margin-top:16px;color:#4a4f57}
+#sowhat-archive .swa-letter-read{margin-top:24px}
+/* 이번 호 요약: category · title · one-line summary, no pictures; each row opens that story */
+#sowhat-archive .swa-sum-list{list-style:none;margin:0;padding:0;border-top:1px solid #1b1d22}
+#sowhat-archive .swa-sum-row>a{display:grid;grid-template-columns:76px minmax(0,1fr) 24px;gap:18px;align-items:start;padding:20px 4px;border-bottom:1px solid #eceef1}
+#sowhat-archive .swa-sum-cat{font-size:14px;font-weight:800;color:#d12f30;line-height:1.55;padding-top:1px}
+#sowhat-archive .swa-sum-body{display:block;min-width:0}
+#sowhat-archive .swa-sum-h{display:block;font-size:17.5px;line-height:1.5;font-weight:700;letter-spacing:-.035em;color:#1b1d22;word-break:keep-all;transition:color .15s}
+#sowhat-archive .swa-sum-x{display:block;margin-top:6px;font-size:15px;line-height:1.65;color:#555b65;word-break:keep-all}
+#sowhat-archive .swa-sum-go svg{display:block;width:20px;height:20px;margin-top:3px;fill:none;stroke:#b4b9c1;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s,stroke .2s}
+#sowhat-archive .swa-sum-row>a:hover .swa-sum-h{color:#d12f30}
+#sowhat-archive .swa-sum-row>a:hover .swa-sum-go svg{stroke:#d12f30;transform:translateX(3px)}
+#sowhat-archive .swa-letter-backbar{display:none}
+@media(max-width:1100px){#sowhat-archive .swa-letter-hero h1{font-size:31px}}
+@media(max-width:820px){
+#sowhat-archive .swa-letter-back .swa-brand-context{font-size:15.5px}
+#sowhat-archive .swa-letter-main{padding-top:20px}
+#sowhat-archive .swa-letter-hero{grid-template-columns:1fr;gap:18px}
+#sowhat-archive .swa-letter-hero h1{font-size:clamp(24px,6.6vw,30px)}
+#sowhat-archive .swa-letter-intro{font-size:15.5px}
+#sowhat-archive .swa-sum-row>a{grid-template-columns:56px minmax(0,1fr);gap:12px;padding:16px 0}
+#sowhat-archive .swa-sum-go{display:none}
+#sowhat-archive .swa-sum-cat{font-size:13.5px}
+#sowhat-archive .swa-sum-h{font-size:16.5px}
+#sowhat-archive .swa-sum-x{font-size:14.5px}
+/* phones: newer / older as simple underlined text links */
+#sowhat-archive .swa-issue-btn{width:auto;height:auto;padding:6px 0;background:none;border-radius:0;color:#2b2f36;font-size:15px;font-weight:700;gap:6px}
+#sowhat-archive .swa-issue-btn span{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+#sowhat-archive .swa-issue-btn svg{width:16px;height:16px}
+#sowhat-archive .swa-issue-btn:active{color:#d12f30}
+/* red "모아보기로 가기" bar at the end of the page */
+#sowhat-archive.swa-letter{padding-bottom:56px}
+#sowhat-archive .swa-letter-backbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;box-sizing:border-box;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:#d12f30;color:#fff;font-size:17px;font-weight:800;letter-spacing:-.03em;box-shadow:0 -4px 16px rgba(25,32,48,.12);transform:translateY(110%);opacity:0;pointer-events:none;transition:transform .25s ease,opacity .25s ease}
+#sowhat-archive .swa-letter-backbar.is-shown{transform:none;opacity:1;pointer-events:auto}
+#sowhat-archive .swa-letter-backbar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}}
+@media(max-width:820px) and (prefers-reduced-motion:reduce){#sowhat-archive .swa-letter-backbar{transition:none}}

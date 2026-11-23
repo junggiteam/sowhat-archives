@@ -83,6 +83,40 @@ def intro_lines(item: dict, sections: list[dict], early: str = '') -> list[str]:
     return [first, topics, '이번 호에서 다룬 핵심 내용을 모았습니다.']
 
 
+def lead_story(item: dict, sections: list[dict]) -> dict | None:
+    """The story the issue is named after (its headline starts with the issue title, or uses the cover image)."""
+    title = re.sub(r'\s+', ' ', item.get('title', '')).strip()
+    for s in sections:
+        head = re.sub(r'\s+', ' ', s['headline']).strip()
+        if title and (head.startswith(title) or title.startswith(head)):
+            return s
+    for s in sections:
+        if item.get('image') and s.get('image') == item['image']:
+            return s
+    return None
+
+
+def hero_summary(text: str, limit: int = 170) -> str:
+    """First one or two sentences of the lead story, cut at a sentence end."""
+    text = ' '.join(text.split()).rstrip('…').strip()
+    sentences = re.split(r'(?<=[.!?요다])\s+', text)
+    out = sentences[0]
+    if len(sentences) > 1 and len(out) + 1 + len(sentences[1]) <= limit and sentences[1][-1:] in '.!?요다':
+        out += ' ' + sentences[1]
+    return out
+
+
+def topics_line(sections: list[dict]) -> str:
+    """When the cover story is the market overview: one line naming the topics this issue covers."""
+    order = [label for label, _, _ in sowhat_sections.CATEGORIES]
+    cats = [SAY.get(c, c) for c in order if any(s['cat'] == c for s in sections)]
+    if not cats:
+        return ''
+    if len(cats) >= 4:
+        return f'{"·".join(cats[:3])}부터 {"·".join(cats[3:])}까지, 이번 호에서 다룬 핵심 내용을 모았습니다.'
+    return f'{"·".join(cats)} 소식을 중심으로, 이번 호에서 다룬 핵심 내용을 모았습니다.'
+
+
 def render(item: dict, entry: dict, early: str, newer: dict | None, older: dict | None,
            head: str, template: str, archive_css: str, letter_css: str, archive_js: str) -> str:
     vol = item['volume']
@@ -93,45 +127,53 @@ def render(item: dict, entry: dict, early: str, newer: dict | None, older: dict 
     footer = re.search(r'<div class="swa-wrap"><footer class="swa-footer[^"]*">.*?</footer></div>', template, re.S).group(0).replace('src="/assets/', f'src="{SITE}assets/')
     totop = re.search(r'<a class="swa-totop".*?</a>', template, re.S).group(0)
 
-    lines = intro_lines(item, sections, early)
-    intro = ''.join(f'<span>{escape(line)}</span>' for line in lines)
+    # The cover image belongs to the issue's lead story: the hero shows that story's title and
+    # summary, and the list below shows only the other stories (no repeat).
+    lead = lead_story(item, sections)
+    rest = [x for x in sections if x is not lead]
+    summary = hero_summary(lead['excerpt']) if lead and lead.get('excerpt') else (early or topics_line(sections))
     image = item.get('image', '')
     cover = (f'<div class="swa-letter-cover"><img src="{escape(image, quote=True)}" alt="" width="630" height="360" decoding="async"></div>'
              if image else '')
     hero = (f'<section class="swa-letter-hero{" no-cover" if not image else ""}">'
             f'<div class="swa-letter-text"><p class="swa-letter-meta"><span class="swa-letter-vol">Vol. {str(vol).zfill(3)}</span>'
-            f'<time datetime="{item["date"]}">{item["date"].replace("-", ".")}</time></p>'
+            f'<time datetime="{item["date"]}">{item["date"].replace("-", ".")}</time>'
+            + (f'<span class="swa-letter-cat">{escape(lead["cat"])}</span>' if lead else '') + '</p>'
             f'<h1>{escape(item["title"])}</h1>'
-            + (f'<p class="swa-letter-intro">{intro}</p>' if intro else '') +
+            + (f'<p class="swa-letter-intro">{escape(summary)}</p>' if summary else '') +
             f'<a class="swa-letter-read" href="{escape(item["url"], quote=True)}" target="_blank" rel="noopener">이번 호 전체 읽기{ARROW_R}</a></div>'
             f'{cover}</section>')
 
     slugs = {label: slug for label, slug, _ in sowhat_sections.CATEGORIES}
-    cards = []
-    for s in sections:
-        slug = slugs.get(s['cat'])
-        link = (sowhat_sections.issue_url(vol, slug, s.get('n', 1))
+    rows = []
+    for x in rest:
+        slug = slugs.get(x['cat'])
+        link = (sowhat_sections.issue_url(vol, slug, x.get('n', 1))
                 if slug and sowhat_sections.issue_path(vol).exists() else item['url'])
-        thumb = (f'<span class="swa-story-thumb"><img src="{escape(s["image"], quote=True)}" alt="" width="380" height="217" loading="lazy" decoding="async"></span>'
-                 if s.get('image') else '')
-        cards.append(f'<li class="swa-story"><a href="{escape(link, quote=True)}" target="_blank" rel="noopener">{thumb}'
-                     f'<span class="swa-story-body"><span class="swa-story-cat">{escape(s["cat"])}</span>'
-                     f'<strong class="swa-story-h">{escape(s["headline"])}</strong>'
-                     + (f'<span class="swa-story-x">{escape(sowhat_summaries.short_excerpt(s["excerpt"]))}</span>' if s.get('excerpt') and sowhat_summaries.short_excerpt(s['excerpt']) != s['headline'] else '') +
-                     '</span></a></li>')
-    stories = (f'<section class="swa-letter-stories" aria-labelledby="swa-stories-h"><h2 id="swa-stories-h">이번 호 기사</h2>'
-               f'<ol class="swa-story-grid">{"".join(cards)}</ol></section>') if cards else ''
+        text = sowhat_summaries.short_excerpt(x['excerpt']) if x.get('excerpt') else ''
+        rows.append(f'<li class="swa-sum-row"><a href="{escape(link, quote=True)}" target="_blank" rel="noopener">'
+                    f'<span class="swa-sum-cat">{escape(x["cat"])}</span>'
+                    f'<span class="swa-sum-body"><strong class="swa-sum-h">{escape(x["headline"])}</strong>'
+                    + (f'<span class="swa-sum-x">{escape(text)}</span>' if text and text != x['headline'] else '') +
+                    f'</span><span class="swa-sum-go">{ARROW_R}</span></a></li>')
+    stories = (f'<section class="swa-letter-stories" aria-labelledby="swa-stories-h"><h2 id="swa-stories-h">이번 호 요약</h2>'
+               f'<ol class="swa-sum-list">{"".join(rows)}</ol></section>') if rows else ''
 
     topics = ''.join(f'<a class="swa-topic" href="{SITE}category/{slug}/">{escape(label)}</a>' for label, slug, _ in sowhat_sections.CATEGORIES)
     topic_box = (f'<section class="swa-letter-topics" aria-labelledby="swa-topics-h"><h2 id="swa-topics-h">주제별 뉴스레터 모아보기</h2>'
                  f'<nav class="swa-topic-grid" aria-label="주제별 뉴스레터">{topics}</nav></section>')
 
-    left = (f'<a class="swa-issue-btn is-newer" href="{letter_url(newer)}" aria-label="다음호 요약 보기, Vol. {newer["volume"]}">{ARROW_L}다음호 요약 보기</a>'
+    left = (f'<a class="swa-issue-btn is-newer" href="{letter_url(newer)}" aria-label="다음호 요약 보기, Vol. {newer["volume"]}">{ARROW_L}<span>다음호 요약 보기</span></a>'
             if newer else '<span class="swa-issue-slot" aria-hidden="true"></span>')
-    right = (f'<a class="swa-issue-btn is-older" href="{letter_url(older)}" aria-label="이전호 요약 보기, Vol. {older["volume"]}">이전호 요약 보기{ARROW_R}</a>'
+    right = (f'<a class="swa-issue-btn is-older" href="{letter_url(older)}" aria-label="이전호 요약 보기, Vol. {older["volume"]}"><span>이전호 요약 보기</span>{ARROW_R}</a>'
              if older else '<span class="swa-issue-slot" aria-hidden="true"></span>')
     pager = f'<nav class="swa-issue-pager" aria-label="다른 호 요약">{left}{right}</nav>' if (newer or older) else ''
+    # phones: red "모아보기로 가기" bar slides up once the reader reaches the end (same as category pages)
+    back_bar = f'<a class="swa-letter-backbar" href="{SITE}" data-swa-letter-back>{ARROW_L}모아보기로 가기</a>'
+    back_js = ("(function(){var b=document.querySelector('[data-swa-letter-back]'),e=document.querySelector('.swa-issue-pager')||document.querySelector('.swa-letter-topics');"
+               "if(!b||!e)return;function u(){b.classList.toggle('is-shown',e.getBoundingClientRect().bottom<window.innerHeight+40)}"
+               "addEventListener('scroll',u,{passive:true});addEventListener('resize',u,{passive:true});u()})();")
 
     body = (f'<div id="sowhat-archive" class="swa-letter" data-archive-base="{SITE}">' + top +
-            f'<main class="swa-wrap swa-letter-main">{hero}{stories}{topic_box}{pager}</main>' + footer + totop + '</div>')
-    return head + '<style>\n' + archive_css + letter_css + '\n</style>\n' + body + '\n<script>\n' + archive_js + '\n</script>\n</body></html>\n'
+            f'<main class="swa-wrap swa-letter-main">{hero}{stories}{topic_box}{pager}</main>' + footer + totop + back_bar + '</div>')
+    return head + '<style>\n' + archive_css + letter_css + '\n</style>\n' + body + '\n<script>\n' + archive_js + '\n' + back_js + '\n</script>\n</body></html>\n'
