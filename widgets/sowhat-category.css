@@ -28,6 +28,7 @@
 @media(max-width:820px){#sowhat-archive .swa-cat{padding-top:28px}#sowhat-archive .swa-cat-hero h1{font-size:clamp(28px,8.5vw,40px);letter-spacing:-1.5px}}
 @media(max-width:560px){#sowhat-archive .swa-cat-row>a{grid-template-columns:1fr;gap:10px;padding:20px 0}#sowhat-archive .swa-cat-thumb{order:-1;width:100%}#sowhat-archive .swa-cat-when b{display:inline;font-size:15px;margin-right:6px}#sowhat-archive .swa-cat-h{font-size:18px}#sowhat-archive .swa-cat-tab{height:36px;padding:0 14px;font-size:14px}}
 @media(max-width:560px){#sowhat-archive .swa-cat-hero{gap:6px;padding-bottom:16px}#sowhat-archive .swa-cat-hero p{font-size:15px;margin-top:8px}#sowhat-archive .swa-cat-tabs{flex-wrap:nowrap;overflow-x:auto;margin:14px -20px 4px;padding:0 20px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}#sowhat-archive .swa-cat-tabs::-webkit-scrollbar{display:none}#sowhat-archive .swa-cat-tab{flex:none;height:34px;padding:0 13px}#sowhat-archive .swa-cat-thumb{aspect-ratio:2}}
+@media(max-width:340px){#sowhat-archive .swa-cat-tabs{margin-inline:-14px;padding-inline:14px}}
 /* Bottom bar back to the archive (same look as the volume reader). Mobile only, shown near the end. */
 #sowhat-archive .swa-cat-back{display:none}
 @media(max-width:820px){

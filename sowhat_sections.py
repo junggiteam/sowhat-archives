@@ -19,14 +19,14 @@ MIN_VOLUME = 16  # issues up to Vol. 15 used a different layout
 LABELS = ['시황', '기업', '금융', '투자', 'M&A', 'IPO', '승계', 'TAX', '재테크']
 CATEGORIES = [
     # (label, slug, intro)
-    ('기업', 'company', '기업 현장의 이슈와 경영 판단에 필요한 정보를 모았습니다.'),
+    ('기업', 'company', '기업의 실적, 사업 전략과 주요 경영 이슈를 정리합니다.'),
     ('금융', 'finance', '금리·대출·정책금융처럼 기업과 개인에 영향을 주는 금융 소식을 모았습니다.'),
     ('투자', 'invest', '증시 흐름과 투자 판단에 도움이 되는 시장 이야기를 모았습니다.'),
-    ('M&A', 'ma', '기업 인수·매각 동향과 거래 구조, 몸값을 매기는 방법을 모았습니다.'),
+    ('M&A', 'ma', '기업 인수합병·매각 동향과 거래 구조, 기업가치에 관한 M&A 정보를 모았습니다.'),
     ('IPO', 'ipo', '상장을 준비하는 기업과 공모 시장의 흐름을 모았습니다.'),
     ('승계', 'succession', '가업승계와 지분 이전, 상속·증여 설계의 핵심을 모았습니다.'),
     ('TAX', 'tax', '기업과 대표가 알아야 할 세금 이슈와 절세 방법을 모았습니다.'),
-    ('재테크', 'wealth', '자산을 지키고 불리는 데 필요한 재테크 정보를 모았습니다.'),
+    ('재테크', 'wealth', '자산관리와 절세 등 생활 속 재테크에 참고할 만한 글을 모았습니다.'),
 ]
 ISSUE_DIR = ROOT / 'issue'  # hosted copy of each issue: issue/<volume>/index.html
 SITE = 'https://sowhat.bestexit.co.kr/'

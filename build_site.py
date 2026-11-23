@@ -54,7 +54,7 @@ SITE_DESCRIPTION = '쏘왓레터는 경제 흐름과 기업 경영에 필요한 
 def page_title(archive_month: str) -> str:
     if archive_month:
         return month_name(archive_month) + ' 경제·경영 뉴스레터 모아보기 | 쏘왓레터'
-    return '중기이코노미 쏘왓레터 모아보기'
+    return '중기이코노미 쏘왓레터 모아보기 | 경제·경영 뉴스레터'
 
 
 def page_head(title, description, canonical, share_title, share_description, graph):
@@ -126,15 +126,21 @@ def render_category_page(payload: dict, cache: dict, label: str) -> str:
     slug, intro = next((s2, i) for l, s2, i in sowhat_sections.CATEGORIES if l == label)
     rows = sowhat_sections.by_category(payload['items'], cache)[label]
     canonical = category_url(slug)
-    title = f'{label} 뉴스레터 모아보기 | 쏘왓레터'
-    description = f'{intro} 쏘왓레터 각 호의 {label} 이야기를 최신순으로 정리했습니다.'
+    topic_title = {
+        'company': '기업 경영 뉴스레터 모아보기',
+        'ma': 'M&A 정보와 인수합병 동향 모아보기',
+        'succession': '기업승계 뉴스레터 모아보기',
+        'tax': '기업 세무·절세 뉴스레터 모아보기',
+    }.get(slug, f'{label} 뉴스레터 모아보기')
+    title = f'{topic_title} | 쏘왓레터'
+    description = f'{intro} 중기이코노미 쏘왓레터에서 발행한 글을 최신순으로 읽어보세요.'
     graph = [
         {'@type':'WebSite','@id':CANONICAL+'#website','url':CANONICAL,'name':'쏘왓레터','inLanguage':'ko-KR','publisher':{'@type':'Organization','name':'중기이코노미'}},
         {'@type':'BreadcrumbList','itemListElement':[
             {'@type':'ListItem','position':1,'name':'쏘왓레터 모아보기','item':CANONICAL},
             {'@type':'ListItem','position':2,'name':f'{label} 뉴스레터','item':canonical},
         ]},
-        {'@type':'CollectionPage','@id':canonical+'#list','name':f'{label} 뉴스레터 모아보기','url':canonical,'inLanguage':'ko-KR','isPartOf':{'@id':CANONICAL+'#website'},
+        {'@type':'CollectionPage','@id':canonical+'#list','name':topic_title,'url':canonical,'inLanguage':'ko-KR','isPartOf':{'@id':CANONICAL+'#website'},
          'mainEntity':{'@type':'ItemList','numberOfItems':len(rows),'itemListElement':[{'@type':'ListItem','position':n+1,'item':{'@type':'CreativeWork','name':sec['headline'],'url':it['url'],'datePublished':it['date']}} for n,(it,sec) in enumerate(rows)]}},
     ]
     head = page_head(title, description, canonical, title, description, graph)
