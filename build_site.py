@@ -133,11 +133,16 @@ def render_category_page(payload: dict, cache: dict, label: str) -> str:
     slug, intro = next((s2, i) for l, s2, i in sowhat_sections.CATEGORIES if l == label)
     rows = sowhat_sections.by_category(payload['items'], cache)[label]
     canonical = category_url(slug)
+    # search title: the "○○ 뉴스레터" keyword first, then a second search phrase
     topic_title = {
-        'company': '기업 경영 뉴스레터 모아보기',
-        'ma': 'M&A 정보와 인수합병 동향 모아보기',
-        'succession': '기업승계 뉴스레터 모아보기',
-        'tax': '기업 세무·절세 뉴스레터 모아보기',
+        'company': '기업 뉴스레터 · 기업 경영 이슈 모아보기',
+        'finance': '금융 뉴스레터 · 금리·대출 동향 모아보기',
+        'invest': '투자 뉴스레터 · 증시·투자 흐름 모아보기',
+        'ma': 'M&A 뉴스레터 · 인수합병 동향 모아보기',
+        'ipo': 'IPO 뉴스레터 · 상장·공모주 흐름 모아보기',
+        'succession': '기업승계 뉴스레터 · 가업승계 모아보기',
+        'tax': '세무 뉴스레터 · 기업 세무·절세 모아보기',
+        'wealth': '재테크 뉴스레터 · 자산관리·절세 모아보기',
     }.get(slug, f'{label} 뉴스레터 모아보기')
     title = f'{topic_title} | 쏘왓레터'
     description = f'{intro} 중기이코노미 쏘왓레터에서 발행한 글을 최신순으로 읽어보세요.'

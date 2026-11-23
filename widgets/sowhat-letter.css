@@ -113,3 +113,15 @@
 #sowhat-archive .swa-letter-backbar.is-shown{transform:none;opacity:1;pointer-events:auto}
 #sowhat-archive .swa-letter-backbar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}}
 @media(max-width:820px) and (prefers-reduced-motion:reduce){#sowhat-archive .swa-letter-backbar{transition:none}}
+/* ---- revision 3 (PC): a little larger text; the cover fills the text height, its bottom on the button's bottom line ---- */
+@media(min-width:821px){
+#sowhat-archive .swa-letter-hero{align-items:stretch;grid-template-columns:minmax(0,1fr) minmax(0,.8fr)}
+#sowhat-archive .swa-letter-vol{font-size:18px}
+#sowhat-archive .swa-letter-meta time{font-size:15.5px}
+#sowhat-archive .swa-letter-cat{font-size:14px;padding:2px 9px}
+#sowhat-archive .swa-letter-hero h1{font-size:40px;line-height:1.26}
+#sowhat-archive .swa-letter-intro{font-size:18px;line-height:1.7;margin-top:18px}
+#sowhat-archive .swa-letter-read{height:52px;padding:0 24px;font-size:16.5px;margin-top:26px}
+#sowhat-archive .swa-letter-cover{position:relative;aspect-ratio:auto;min-height:240px}
+#sowhat-archive .swa-letter-cover img{position:absolute;inset:0}}
+@media(min-width:821px) and (max-width:1100px){#sowhat-archive .swa-letter-hero h1{font-size:34px}#sowhat-archive .swa-letter-intro{font-size:17px}}
