@@ -1,3 +1,4 @@
+from html import escape
 import json
 import unittest
 from email.utils import parsedate_to_datetime
@@ -95,10 +96,13 @@ class SeoTests(unittest.TestCase):
         url = CANONICAL + 'letters/115/'
         newest = data['items'][0]
         self.assertEqual(letter_url(newest), url)
-        html = render_letter(newest, summaries['new'], cache['issues']['new'], [])
+        html = render_letter(newest, summaries['new'], cache['issues']['new'], None, None)
         self.assertEqual(Page(html).canonicals, [url])
         self.assertIn(CANONICAL + 'category/ma/', html)
-        self.assertIn(body(summaries['new']), html)
+        # the page shows the same editorial text as the feed (headline and short summary), laid out as cards
+        for _, headline, excerpt in summaries['new']['stories']:
+            self.assertIn(escape(headline), html)
+            self.assertIn(escape(excerpt), html)
         self.assertIn(url, sitemap(data, summaries=summaries))
         self.assertNotIn(url, render_page(data))
         self.assertNotIn(url, render_page(data, '2026-11'))

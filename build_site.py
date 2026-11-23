@@ -19,6 +19,7 @@ from xml.etree.ElementTree import Element, ParseError, SubElement, fromstring, r
 from build_sowhat_widget import build, render_widget, month_name, month_url
 import sowhat_sections
 import sowhat_summaries
+import sowhat_letter_page
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent
@@ -183,7 +184,7 @@ def letter_url(item: dict) -> str:
     return f'{CANONICAL}letters/{item["volume"]}/'
 
 
-def render_letter(item: dict, summary: dict, cache_entry: dict, adjacent: list[tuple[str, dict]]) -> str:
+def render_letter(item: dict, summary: dict, cache_entry: dict, newer: dict | None, older: dict | None) -> str:
     canonical = letter_url(item)
     title = f'Vol. {item["volume"]} {item["title"]} | 쏘왓레터'
     story_titles = ' · '.join(headline for _, headline, _ in summary['stories'][:3])
@@ -201,27 +202,11 @@ def render_letter(item: dict, summary: dict, cache_entry: dict, adjacent: list[t
     if image:
         graph[0]['image'] = image
     head = page_head(title, description, canonical, title, description, graph, share_image=image, article=True)
-    head = head.replace('</head>', '<link rel="stylesheet" href="/assets/sowhat-summary.css">\n</head>', 1)
-    cover = f'\n    <img src="{escape(image, quote=True)}" alt="" width="630" height="360">' if image else ''
-    category_names = {category for category, _, _ in summary['stories']}
-    related = ''.join(f'<a href="{category_url(slug)}">{escape(label)} 뉴스레터</a>'
-                      for label, slug, _ in sowhat_sections.CATEGORIES if label in category_names)
-    other_issues = ''.join(f'<a href="{letter_url(other)}">{label} Vol. {other["volume"]}</a>' for label, other in adjacent)
-    categories = f'\n    <nav aria-label="관련 카테고리">{related}</nav>' if related else ''
-    month = month_url(item['date'][:7])
-    return head + f'''
-<main class="letter">
-  <nav aria-label="아카이브"><a href="{CANONICAL}">쏘왓레터 모아보기</a><a href="{month}">{month_name(item['date'][:7])}</a></nav>
-  <article>
-    <p class="issue-date">Vol. {item['volume']} · <time datetime="{datetime_value}">{display_date}</time></p>
-    <h1>{escape(item['title'])}</h1>{cover}
-    <section aria-labelledby="issue-summary"><h2 id="issue-summary">이번 호 요약</h2>{sowhat_summaries.body(summary)}</section>
-  </article>
-  <div class="letter-actions">
-    <nav aria-label="발행호"><a href="{escape(item['url'], quote=True)}">뉴스레터 읽기</a>{other_issues}</nav>{categories}
-  </div>
-</main></body></html>
-'''
+    template = (ROOT / 'widgets/sowhat-archive-template.html').read_text(encoding='utf-8')
+    css = (ROOT / 'widgets/sowhat-archive.css').read_text(encoding='utf-8')
+    letter_css = (ROOT / 'widgets/sowhat-letter.css').read_text(encoding='utf-8')
+    js = (ROOT / 'widgets/sowhat-archive.js').read_text(encoding='utf-8')
+    return sowhat_letter_page.render(item, cache_entry, summary['introduction'], newer, older, head, template, css, letter_css, js)
 
 
 def sitemap(payload: dict, cache: dict | None = None, summaries: dict | None = None) -> str:
@@ -304,16 +289,17 @@ def main() -> None:
         destination.parent.mkdir(parents=True,exist_ok=True)
         destination.write_text(sowhat_sections.with_analytics(render_page(data, key)), encoding='utf-8')
     letters = [item for item in data['items'] if item['id'] in summaries]
+    # next/previous buttons walk the summaries from Vol. 16 (newest first); older pages keep only the way back
+    nav = sowhat_letter_page.navigable(data['items'], summaries)
+    position = {item['id']: i for i, item in enumerate(nav)}
     letter_dir = ROOT / 'letters'
-    for index, item in enumerate(letters):
-        adjacent = []
-        if index + 1 < len(letters):
-            adjacent.append(('이전 호', letters[index + 1]))
-        if index > 0:
-            adjacent.append(('다음 호', letters[index - 1]))
+    for item in letters:
+        i = position.get(item['id'])
+        newer = nav[i - 1] if i is not None and i > 0 else None
+        older = nav[i + 1] if i is not None and i + 1 < len(nav) else None
         destination = letter_dir / str(item['volume']) / 'index.html'
         destination.parent.mkdir(parents=True, exist_ok=True)
-        html = render_letter(item, summaries[item['id']], cache.get('issues', {}).get(item['id'], {}), adjacent)
+        html = render_letter(item, summaries[item['id']], cache.get('issues', {}).get(item['id'], {}), newer, older)
         destination.write_text(sowhat_sections.with_analytics(html), encoding='utf-8')
     volumes = {str(item['volume']) for item in letters}
     for old in letter_dir.glob('*/index.html'):

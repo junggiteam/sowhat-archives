@@ -1,0 +1,71 @@
+
+/* ---- Issue summary pages (/letters/<vol>/) ---- */
+#sowhat-archive .swa-letter-back{gap:6px}
+#sowhat-archive .swa-letter-back svg{width:20px;height:20px;flex:none;fill:none;stroke:#1b1d22;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease}
+#sowhat-archive .swa-letter-back:hover .swa-brand-context,#sowhat-archive .swa-letter-back:hover svg{color:#d12f30;stroke:#d12f30}
+#sowhat-archive .swa-letter-back:hover svg{transform:translateX(-3px)}
+#sowhat-archive .swa-letter-main{padding-top:44px;padding-bottom:64px}
+/* hero: text starts at the top edge of the cover image */
+#sowhat-archive .swa-letter-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:44px;align-items:start;padding-bottom:40px;border-bottom:1px solid #e5e7eb}
+#sowhat-archive .swa-letter-hero.no-cover{grid-template-columns:1fr}
+#sowhat-archive .swa-letter-meta{display:flex;align-items:baseline;gap:12px;margin:0 0 14px}
+#sowhat-archive .swa-letter-vol{font-size:17px;font-weight:800;color:#d12f30;letter-spacing:-.01em}
+#sowhat-archive .swa-letter-meta time{font-size:14.5px;font-weight:600;color:#6b707a;font-variant-numeric:tabular-nums}
+#sowhat-archive .swa-letter-hero h1{font-size:40px;line-height:1.25;font-weight:800;letter-spacing:-.045em;color:#15171b;word-break:keep-all;margin:0}
+#sowhat-archive .swa-letter-intro{margin:18px 0 0;font-size:17px;line-height:1.65;color:#3a3f47;letter-spacing:-.03em;word-break:keep-all}
+#sowhat-archive .swa-letter-intro span{display:block}
+#sowhat-archive .swa-letter-read{display:inline-flex;align-items:center;gap:8px;margin-top:26px;height:50px;padding:0 22px;border-radius:10px;background:#d12f30;color:#fff;font-size:15.5px;font-weight:700;letter-spacing:-.02em}
+#sowhat-archive .swa-letter-read svg,#sowhat-archive .swa-issue-btn svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#sowhat-archive .swa-letter-cover{border-radius:16px;overflow:hidden;background:#f1f3f5;aspect-ratio:1.75}
+#sowhat-archive .swa-letter-cover img{display:block;width:100%;height:100%;object-fit:cover}
+/* story cards */
+#sowhat-archive .swa-letter-stories{padding-top:40px}
+#sowhat-archive .swa-letter-stories h2,#sowhat-archive .swa-letter-topics h2{font-size:21px;font-weight:800;letter-spacing:-.04em;color:#1b1d22;margin:0 0 18px}
+#sowhat-archive .swa-story-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+#sowhat-archive .swa-story>a{display:flex;flex-direction:column;height:100%;background:#fff;border:1px solid #eceef1;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(25,32,48,.05);transition:box-shadow .2s ease,transform .2s ease}
+#sowhat-archive .swa-story>a:hover{box-shadow:0 8px 22px rgba(25,32,48,.09);transform:translateY(-2px)}
+#sowhat-archive .swa-story-thumb{display:block;aspect-ratio:1.75;background:#f1f3f5;overflow:hidden}
+#sowhat-archive .swa-story-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+#sowhat-archive .swa-story-body{display:flex;flex-direction:column;gap:8px;padding:18px 18px 20px}
+#sowhat-archive .swa-story-cat{font-size:13px;font-weight:800;color:#d12f30;letter-spacing:.01em}
+#sowhat-archive .swa-story-h{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:17px;line-height:1.45;font-weight:700;letter-spacing:-.035em;color:#1b1d22;word-break:keep-all}
+#sowhat-archive .swa-story>a:hover .swa-story-h{color:#d12f30}
+#sowhat-archive .swa-story-x{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;font-size:14.5px;line-height:1.6;color:#555b65;word-break:keep-all}
+/* eight topic links */
+#sowhat-archive .swa-letter-topics{margin-top:44px;padding:22px 22px 24px;border-radius:16px;background:#f6f7f9}
+#sowhat-archive .swa-letter-topics h2{font-size:17px;margin-bottom:14px}
+#sowhat-archive .swa-topic-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
+#sowhat-archive .swa-topic{display:flex;align-items:center;justify-content:center;height:46px;border:1px solid #e3e6ea;border-radius:10px;background:#fff;font-size:14.5px;font-weight:700;color:#2b2f36;transition:border-color .15s,color .15s}
+#sowhat-archive .swa-topic:hover{border-color:#d12f30;color:#d12f30}
+/* newer (left) / older (right) issue buttons */
+#sowhat-archive .swa-issue-pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px;padding-top:28px;border-top:1px solid #e5e7eb}
+#sowhat-archive .swa-issue-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 22px;border-radius:10px;background:#d12f30;color:#fff;font-size:15.5px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+#sowhat-archive .swa-issue-btn.is-newer{justify-self:start}
+#sowhat-archive .swa-issue-btn.is-older{justify-self:end}
+@keyframes swaArrowL{from{transform:translateX(0)}to{transform:translateX(-6px)}}
+@keyframes swaArrowR{from{transform:translateX(0)}to{transform:translateX(6px)}}
+@media(hover:hover){
+#sowhat-archive .swa-issue-btn.is-newer:hover svg,#sowhat-archive .swa-issue-btn.is-newer:focus-visible svg{animation:swaArrowL .8s ease-in-out infinite alternate}
+#sowhat-archive .swa-issue-btn.is-older:hover svg,#sowhat-archive .swa-issue-btn.is-older:focus-visible svg,#sowhat-archive .swa-letter-read:hover svg{animation:swaArrowR .8s ease-in-out infinite alternate}}
+@media(prefers-reduced-motion:reduce){#sowhat-archive .swa-issue-btn svg,#sowhat-archive .swa-letter-read svg{animation:none!important}#sowhat-archive .swa-story>a{transition:none}#sowhat-archive .swa-story>a:hover{transform:none}}
+@media(max-width:1100px){#sowhat-archive .swa-story-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#sowhat-archive .swa-letter-hero h1{font-size:34px}}
+@media(max-width:820px){
+#sowhat-archive .swa-letter-main{padding-top:24px;padding-bottom:40px}
+#sowhat-archive .swa-letter-hero{grid-template-columns:1fr;gap:20px;padding-bottom:30px}
+#sowhat-archive .swa-letter-cover{order:-1;border-radius:14px}
+#sowhat-archive .swa-letter-hero h1{font-size:clamp(25px,7vw,32px)}
+#sowhat-archive .swa-letter-intro{font-size:16px;line-height:1.6;margin-top:14px}
+#sowhat-archive .swa-letter-read{display:flex;justify-content:center;width:100%;margin-top:20px}
+#sowhat-archive .swa-letter-stories{padding-top:30px}
+#sowhat-archive .swa-letter-stories h2{font-size:19px;margin-bottom:14px}
+#sowhat-archive .swa-story-grid{grid-template-columns:1fr;gap:14px}
+#sowhat-archive .swa-letter-topics{margin-top:30px;padding:18px 16px 18px}
+#sowhat-archive .swa-topic-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#sowhat-archive .swa-topic{height:42px;font-size:14px}
+#sowhat-archive .swa-issue-pager{gap:10px;margin-top:30px;padding-top:22px}
+#sowhat-archive .swa-issue-btn{width:100%;padding:0 10px;font-size:14.5px;gap:5px}
+#sowhat-archive .swa-issue-btn svg{width:16px;height:16px}}
+@media(max-width:360px){#sowhat-archive .swa-issue-btn{font-size:13.5px;gap:3px}#sowhat-archive .swa-topic{font-size:13px}}
+/* the archive keeps its own big title on one line on phones; issue titles must wrap */
+#sowhat-archive .swa-letter-hero h1{white-space:normal}
+#sowhat-archive .swa-letter-text{min-width:0}
