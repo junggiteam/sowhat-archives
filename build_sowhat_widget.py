@@ -48,6 +48,8 @@ def render_widget(all_items: list[dict], archive_month: str = '') -> str:
     import sowhat_sections
     cat_links = ''.join(f'<a class="swa-month-link" href="{BASE}category/{slug}/">{escape(label)} 뉴스레터</a>' for label, slug, _ in sowhat_sections.CATEGORIES)
     template = template.replace('__CATEGORY_LINKS__', cat_links)
+    import sowhat_letter_page
+    template = sowhat_letter_page.fill_template(template, all_items)
     markup = template.replace('__CANONICAL__',canonical).replace('__ARCHIVE_MONTH__',archive_month).replace('__HEADING__',heading).replace('__DESCRIPTION__',description).replace('__GRID_LABEL__',label).replace('__COUNT__', str(len(data))).replace('__CARDS__','\n'.join(cards)).replace('__MONTH_LINKS__', month_links).replace('__DATA__', json.dumps(all_items,ensure_ascii=False).replace('<','\\u003c')).replace('__STRUCTURED__',json.dumps(structured,ensure_ascii=False).replace('<','\\u003c'))
     css = (WIDGETS / 'sowhat-archive.css').read_text(encoding='utf-8')
     js = (WIDGETS / 'sowhat-archive.js').read_text(encoding='utf-8')
