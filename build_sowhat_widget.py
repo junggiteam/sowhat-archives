@@ -38,7 +38,7 @@ def render_widget(all_items: list[dict], archive_month: str = '') -> str:
     heading = '<span class="swa-title-letter">쏘왓레터</span><span class="swa-title-archive">모아보기</span>'
     intro = (
         '매일 쏟아지는 경제 뉴스, 읽고 나서도<br><strong>그래서 어쩌라고?</strong><span class="swa-sub">(So What)</span> 싶으셨나요?',
-        '쏘왓레터는 경제 흐름과 기업 경영 이슈에서<br>판단에 필요한 <strong>결론</strong>을 전합니다.',
+        '쏘왓레터는 복잡한 정보는 덜어내고<br>방향성 있는 <strong>결론</strong>만 전달합니다.',
         '막연함 대신 선명한 기준을 원한다면<br><strong>지금 바로 쏘왓레터를 구독해보세요!</strong>',
     )
     description = ''.join(f'<p>{line}</p>' for line in intro)
