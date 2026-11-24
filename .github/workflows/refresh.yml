@@ -28,6 +28,7 @@ jobs:
       - name: Check archive scoping and SEO metadata
         run: python -m unittest discover -s tests -v
       - name: Save changed publications and request Pages deployment
+        id: save
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -35,7 +36,14 @@ jobs:
           if git diff --staged --quiet; then exit 0; fi
           git config user.name "junggiteam"
           git config user.email "junggiteam@gmail.com"
+          echo "before=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           git commit -m "Auto update: So What archive site"
           git pull --rebase origin main
           git push origin main
           gh api --method POST "repos/${{ github.repository }}/pages/builds" --jq '.status'
+      - name: Tell Naver and Bing which pages changed (IndexNow)
+        if: steps.save.outputs.before != ''
+        continue-on-error: true
+        run: |
+          sleep 90
+          python ping_indexnow.py --changed "${{ steps.save.outputs.before }}"
