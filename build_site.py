@@ -121,7 +121,9 @@ def render_page(payload: dict, archive_month: str = '') -> str:
     share_title = title if archive_month else '결론이 있는 뉴스레터, 중기이코노미 쏘왓레터'
     share_description = description if archive_month else '복잡한 정보는 덜어내고 방향성 있는 결론만 전달하는 쏘왓레터를 구독해보세요'
     head = page_head(title, description, canonical, share_title, share_description, graph)
-    return head + render_widget(payload['items'], archive_month) + '</body></html>\n'
+    # 재동의 메일 [계속 받기]로 들어온 경우(?c=reconsent-숫자)에만 뜨는 알림창. 모아보기 첫 화면에만 넣는다.
+    notice = '' if archive_month else '\n' + (ROOT / 'widgets/reconsent-notice.html').read_text(encoding='utf-8').strip() + '\n'
+    return head + render_widget(payload['items'], archive_month) + notice + '</body></html>\n'
 
 
 def category_url(slug: str) -> str:

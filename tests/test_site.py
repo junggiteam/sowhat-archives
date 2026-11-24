@@ -68,6 +68,12 @@ class SeoTests(unittest.TestCase):
         self.assertEqual(collection['url'],page.canonicals[0])
         self.assertTrue(any(x.get('@type') == 'BreadcrumbList' for x in page.structured[0]['@graph']))
 
+    def test_reconsent_notice_only_on_root_and_only_for_reconsent_link(self):
+        root = render_page(fixture())
+        self.assertEqual(root.count('id="sw-rc"'), 1)
+        self.assertIn("/^reconsent-\\d+$/", root)
+        self.assertNotIn('id="sw-rc"', render_page(fixture(), '2026-11'))
+
     def test_sitemap_contains_canonical_pages_and_real_publication_dates(self):
         tree = ElementTree.fromstring(sitemap(fixture()))
         ns = {'s':'http://www.sitemaps.org/schemas/sitemap/0.9'}

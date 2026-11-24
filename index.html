@@ -838,4 +838,41 @@
 })();
 
 </script>
+
+<!-- 재동의 [계속 받기]로 들어온 경우(?c=reconsent-숫자)에만 알림창 -->
+<style>
+#sw-rc{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(21,23,27,.45);}
+#sw-rc.on{display:flex;}
+#sw-rc .box{width:100%;max-width:400px;background:#fff;border-radius:18px;padding:30px 26px 22px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.18);font-family:Pretendard,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;word-break:keep-all;}
+#sw-rc .ck{width:54px;height:54px;border-radius:50%;background:#fdeeee;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;}
+#sw-rc .ck svg{width:26px;height:26px;}
+#sw-rc h2{margin:0 0 8px;font-size:21px;font-weight:800;color:#15171b;line-height:1.4;}
+#sw-rc p{margin:0 0 16px;font-size:15px;color:#4b5260;line-height:1.65;}
+#sw-rc .tip{background:#f6f7f9;border-radius:12px;padding:12px 14px;font-size:13px;color:#4b5260;line-height:1.6;text-align:left;margin:0 0 18px;}
+#sw-rc .tip b{color:#15171b;}
+#sw-rc button{width:100%;border:0;border-radius:10px;background:#d12f30;color:#fff;font-size:16px;font-weight:800;padding:14px;cursor:pointer;font-family:inherit;}
+</style>
+<div id="sw-rc" role="dialog" aria-modal="true" aria-labelledby="sw-rc-t">
+  <div class="box">
+    <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#d12f30" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2 id="sw-rc-t">계속 받기가 접수되었습니다</h2>
+    <p>앞으로도 쏘왓레터를 보내드릴게요.<br>답해 주셔서 감사합니다.</p>
+    <div class="tip"><b>메일이 스팸함으로 간다면</b><br>쏘왓레터 메일을 '스팸 아님'(네이버: 스팸해제)으로 표시하고, <b>newsletter@junggi.co.kr</b>을 주소록에 추가해 주세요.</div>
+    <button type="button" id="sw-rc-ok">확인</button>
+  </div>
+</div>
+<script>
+(function(){
+  try{
+    var u=new URL(location.href), c=u.searchParams.get('c')||'';
+    if(!/^reconsent-\d+$/.test(c)) return;
+    var el=document.getElementById('sw-rc'); el.classList.add('on');
+    u.searchParams.delete('c'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash);
+    var close=function(){el.classList.remove('on');};
+    document.getElementById('sw-rc-ok').addEventListener('click',close);
+    el.addEventListener('click',function(e){if(e.target===el)close();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+  }catch(e){}
+})();
+</script>
 <script type="text/javascript" src="https://wcs.pstatic.net/wcslog.js"></script><script type="text/javascript">if(!wcs_add) var wcs_add = {};wcs_add["wa"] = "1fb672d3a8b6f00";if(window.wcs) { wcs_do(); }</script></body></html>
