@@ -190,9 +190,9 @@
 /* '최신호 요약' menu beside the other two: same look, red text on hover (no underline) */
 #sowhat-archive .swa-latest-link{text-decoration:none;transition:color .15s}
 #sowhat-archive .swa-latest-link:hover,#sowhat-archive .swa-latest-link:focus-visible{color:#d12f30}
-@media(max-width:480px){#sowhat-archive .swa-menus{display:grid;grid-template-columns:repeat(3,auto);justify-content:space-between;gap:0;width:100%}
+@media(max-width:480px){#sowhat-archive .swa-menus{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:4px 14px;width:100%}
 #sowhat-archive .swa-menus .swa-rail-title{padding:6px 0;gap:5px;font-size:14px;letter-spacing:-.04em}#sowhat-archive .swa-menus .swa-rail-title .swa-cal{width:15px;height:15px}}
-@media(max-width:374px){#sowhat-archive .swa-menus .swa-rail-title{font-size:13px;gap:4px}}
+@media(max-width:374px){#sowhat-archive .swa-menus{column-gap:10px}#sowhat-archive .swa-menus .swa-rail-title{font-size:13px;gap:4px}}
 /* menus: icon-text gap a little tighter, and all three menus turn red on hover */
 #sowhat-archive .swa-menus .swa-rail-title{gap:5px}
 #sowhat-archive .swa-month-nav>summary.swa-rail-title{transition:color .15s}
