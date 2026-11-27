@@ -199,6 +199,8 @@
 #sowhat-archive .swa-month-nav>summary.swa-rail-title:hover,#sowhat-archive .swa-month-nav>summary.swa-rail-title:focus-visible{color:#d12f30}
 @media(max-width:480px){#sowhat-archive .swa-menus .swa-rail-title{gap:4px}}
 @media(max-width:374px){#sowhat-archive .swa-menus .swa-rail-title{gap:3px}}
+/* Korean text never breaks in the middle of a word, on every page (main, month, category, summary) */
+#sowhat-archive,#sowhat-archive *{word-break:keep-all;overflow-wrap:break-word}
 
 /* ---- Issue summary pages (/letters/<vol>/) ---- */
 #sowhat-archive .swa-letter-back{gap:6px}
