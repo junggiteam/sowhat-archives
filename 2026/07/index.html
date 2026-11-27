@@ -201,8 +201,10 @@
 #sowhat-archive .swa-month-nav>summary.swa-rail-title:hover,#sowhat-archive .swa-month-nav>summary.swa-rail-title:focus-visible{color:#d12f30}
 @media(max-width:480px){#sowhat-archive .swa-menus .swa-rail-title{gap:4px}}
 @media(max-width:374px){#sowhat-archive .swa-menus .swa-rail-title{gap:3px}}
-/* Korean text never breaks in the middle of a word, on every page (main, month, category, summary) */
+/* Text wrapping, same rule as the 데일리 브리핑 쏘왓레터 cards: titles wrap at word boundaries,
+   summary sentences fill each line to the right edge (no ragged right side) */
 #sowhat-archive,#sowhat-archive *{word-break:keep-all;overflow-wrap:break-word}
+html #sowhat-archive .swa-cat-x,html #sowhat-archive .swa-sum-x,html #sowhat-archive .swa-story-x,html #sowhat-archive .swa-letter-intro,html #sowhat-archive .swa-cat-hero p{word-break:normal;overflow-wrap:anywhere}
 
 </style>
 <div id="sowhat-archive" data-canonical-url="https://sowhat.bestexit.co.kr/2026/07/" data-archive-month="2026-07" data-archive-base="https://sowhat.bestexit.co.kr/">
